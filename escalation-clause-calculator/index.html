@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Escalation Clause Calculator: Final Price and Seller Net for Multiple Offers</title>
+<meta name="description" content="Free escalation clause calculator for listing agents. Enter every offer, including competing escalation clauses and seller credits, and see each offer's final price and the seller's estimated net.">
+<link rel="canonical" href="https://temperbyte.github.io/escalation-clause-calculator/">
+<meta property="og:title" content="Escalation Clause Calculator">
+<meta property="og:description" content="Final price and seller net for every offer, including two escalation clauses competing against each other.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<div class="wrap">
+<header class="site"><a class="brand" href="/"><i></i>Temperbyte</a><nav><a href="/escalation-clause-calculator/">Escalation</a><a href="/weight-trend-calculator/">Weight trend</a></nav></header>
+
+<h1>Escalation clause calculator</h1>
+<p class="lede">Enter every offer on the listing. You get each offer's final price after escalation and what the seller would actually net, side by side.</p>
+
+<form class="tool" id="f" autocomplete="off" onsubmit="return false">
+  <fieldset>
+    <legend>Seller's costs</legend>
+    <div class="grid">
+      <div><label for="comm">Commission (%)</label><input id="comm" inputmode="decimal" value="5"></div>
+      <div><label for="payoff">Mortgage payoff ($)</label><input id="payoff" inputmode="decimal" value="212400"></div>
+      <div><label for="other">Other selling costs ($)</label><input id="other" inputmode="decimal" value="4800"></div>
+    </div>
+  </fieldset>
+  <fieldset>
+    <legend>Offers</legend>
+    <div id="offers"></div>
+    <div class="actions"><button type="button" id="add">Add an offer</button></div>
+  </fieldset>
+  <fieldset>
+    <label for="basis">Escalation clauses compare against</label>
+    <select id="basis">
+      <option value="gross">The competing offer's price</option>
+      <option value="net">The competing offer's price after seller credits</option>
+    </select>
+  </fieldset>
+  <div class="result" id="out" aria-live="polite"></div>
+</form>
+
+<h2>How escalation clauses are calculated</h2>
+<p>An escalation clause says the buyer will beat any competing offer by a set amount, up to a maximum. So an offer of $455,000 that escalates by $2,000 up to $480,000 becomes $474,000 if the best competing offer is $472,000.</p>
+<p>The calculator uses three rules:</p>
+<ol>
+<li><strong>One escalating offer</strong> reaches the lower of (the highest other offer + its increment) and its cap. It never drops below its own starting price.</li>
+<li><strong>Two or more escalating offers</strong> push against each other until all but one hit their caps. The offer with the highest cap wins, at the lower of (the next highest possible price + its increment) and its cap.</li>
+<li><strong>Equal caps</strong> have no clear winner. The result depends on the clause wording and timing, and the calculator flags it.</li>
+</ol>
+<h3>Price or price after credits?</h3>
+<p>If a competing offer asks for $8,000 in seller credits, some escalation clauses count its full price and some count the price after credits. The two readings can give different results, so switch the option above and compare. Check the clause wording to see which one applies.</p>
+<h3>How the seller's net is estimated</h3>
+<p>Net = final price − seller credits − commission (a percent of the final price) − mortgage payoff − other selling costs. It is an estimate. Title, transfer taxes and prorations vary, so add them to other costs for a closer number.</p>
+<h3>Highest price is not the same as best offer</h3>
+<p>An escalated price only matters if the deal closes. A financed offer far above list price can face an appraisal gap, and a home sale contingency can fall through. Weigh each offer's financing, contingencies and timing alongside the net.</p>
+<p class="note">This calculator is for estimates. It is not legal or tax advice. Follow your brokerage policy and local rules on disclosing offers, since escalation clauses usually require proof of the competing offer.</p>
+
+<div class="cta">
+  <p><strong>Comparing offers every week?</strong> The Offer Comparison skill for Claude does all of this from pasted offers: the side-by-side table, the net for each offer, both escalation readings, a closing-risk rating, the seller's options and a plain-language summary to send.</p>
+  <a class="btn" href="https://payhip.com/b/sfl8H">See Offer Comparison</a>
+</div>
+
+<footer class="site">Made by Temperbyte. Free tools and Claude skills for real estate agents and fitness coaches. <a href="https://payhip.com/Temperbyte">Store</a> · <a href="https://github.com/Temperbyte/temperbyte-skills.">Free skills on GitHub</a></footer>
+</div>
+
+<script>
+const $=s=>document.querySelector(s);
+const money=n=>(n<0?'−$':'$')+Math.round(Math.abs(n)).toLocaleString('en-US');
+const num=v=>{const x=parseFloat(String(v).replace(/[$,\s]/g,''));return isFinite(x)?x:0};
+const optnum=v=>{const t=String(v).replace(/[$,\s]/g,'');if(!t)return null;const x=parseFloat(t);return isFinite(x)?x:null};
+const defaults=[
+  {price:472000,credit:8000,inc:'',cap:''},
+  {price:458000,credit:0,inc:'',cap:''},
+  {price:455000,credit:0,inc:2000,cap:480000}
+];
+let n=0;
+function addOffer(o={price:'',credit:'',inc:'',cap:''}){
+  n++; const L=String.fromCharCode(64+n);
+  const d=document.createElement('div'); d.className='offer'; d.dataset.label=L;
+  d.innerHTML=`<div class="offer-head"><span>Offer ${L}</span><button type="button" class="link rm">Remove</button></div>
+  <div class="grid">
+   <div><label>Price ($)</label><input class="price" inputmode="decimal" value="${o.price}"></div>
+   <div><label>Seller credits ($)</label><input class="credit" inputmode="decimal" value="${o.credit}"></div>
+   <div><label>Escalates by ($)</label><input class="inc" inputmode="decimal" placeholder="none" value="${o.inc}"></div>
+   <div><label>Up to a cap of ($)</label><input class="cap" inputmode="decimal" placeholder="none" value="${o.cap}"></div>
+  </div>`;
+  d.querySelector('.rm').onclick=()=>{d.remove();calc()};
+  $('#offers').appendChild(d);
+}
+defaults.forEach(addOffer);
+$('#add').onclick=()=>{addOffer();calc()};
+document.addEventListener('input',calc);
+
+function calc(){
+  const comm=num($('#comm').value)/100, payoff=num($('#payoff').value), other=num($('#other').value);
+  const basis=$('#basis').value;
+  const offers=[...document.querySelectorAll('.offer')].map(d=>({
+    label:d.dataset.label, price:num(d.querySelector('.price').value), credit:num(d.querySelector('.credit').value),
+    inc:optnum(d.querySelector('.inc').value), cap:optnum(d.querySelector('.cap').value)
+  })).filter(o=>o.price>0);
+  const out=$('#out');
+  if(!offers.length){out.innerHTML='<p class="note">Enter at least one offer price to see results.</p>';return}
+  offers.forEach(o=>{o.esc=o.inc!==null&&o.inc>0&&o.cap!==null&&o.cap>o.price; o.final=o.price});
+  const val=o=>basis==='net'?o.final-o.credit:o.final;
+  // escalating offers bid against each other until stable
+  for(let k=0;k<5000;k++){
+    let changed=false;
+    for(const o of offers){
+      if(!o.esc)continue;
+      const others=offers.filter(x=>x!==o);
+      if(!others.length)continue;
+      const top=Math.max(...others.map(val));
+      const target=Math.max(o.price,Math.min(top+o.inc,o.cap));
+      if(target>o.final){o.final=target;changed=true}
+    }
+    if(!changed)break;
+  }
+  const escs=offers.filter(o=>o.esc);
+  const capped=escs.filter(o=>o.final>=o.cap);
+  let tie=false;
+  if(escs.length>1){const maxCap=Math.max(...escs.map(o=>o.cap)); tie=escs.filter(o=>o.cap===maxCap).length>1}
+  offers.forEach(o=>{o.comm=o.final*comm; o.net=o.final-o.credit-o.comm-payoff-other});
+  const bestNet=offers.reduce((a,b)=>b.net>a.net?b:a);
+  const bestPrice=offers.reduce((a,b)=>b.final>a.final?b:a);
+  const rows=offers.map(o=>`<tr class="${o===bestNet?'win':''}"><td>Offer ${o.label}</td><td class="n">${money(o.price)}</td><td class="n">${o.esc?money(o.final)+(o.final>=o.cap?' (cap)':''):'—'}</td><td class="n">${o.credit?money(o.credit):'—'}</td><td class="n">${money(o.net)}</td></tr>`).join('');
+  let head=`Highest net: <b>Offer ${bestNet.label}, ${money(bestNet.net)}</b>`;
+  if(bestNet!==bestPrice) head+=`. Highest price: Offer ${bestPrice.label}, ${money(bestPrice.final)}`;
+  let notes=[];
+  escs.forEach(o=>{
+    if(o.final===o.price) notes.push(`Offer ${o.label}'s clause does not change its price: no other offer comes within ${money(o.inc)} of it.`);
+    else notes.push(`Offer ${o.label} escalates from ${money(o.price)} to ${money(o.final)}${o.final>=o.cap?', its cap':''}.`);
+  });
+  if(tie) notes.push('Two escalating offers share the highest cap, so there is no clear winner. The result depends on the clause wording and timing. Asking every buyer for their highest and best offer with no escalation clause removes the ambiguity.');
+  if(offers.some(o=>o.credit>0)&&escs.length) notes.push('One or more offers ask for seller credits. Switch "compare against" above to see the other reading of the clause.');
+  out.innerHTML=`<p class="headline">${head}</p>
+  <table><thead><tr><th>Offer</th><th class="n">Price</th><th class="n">After escalation</th><th class="n">Credits</th><th class="n">Seller net</th></tr></thead><tbody>${rows}</tbody></table>
+  ${notes.map(t=>`<p class="note">${t}</p>`).join('')}
+  <p class="note">Net = final price − credits − ${(comm*100).toFixed(2).replace(/\.?0+$/,'')}% commission − ${money(payoff)} payoff − ${money(other)} other costs.</p>`;
+}
+calc();
+</script>
+</body>
+</html>

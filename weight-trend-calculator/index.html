@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Weight Trend Calculator: Weekly Averages and Rate of Change From Daily Weigh-Ins</title>
+<meta name="description" content="Free weight trend calculator for coaches and clients. Paste daily weigh-ins and get weekly averages, the change between weeks, the rate per week as a percent of body weight, and a 7-day trend chart.">
+<link rel="canonical" href="https://temperbyte.github.io/weight-trend-calculator/">
+<meta property="og:title" content="Weight Trend Calculator">
+<meta property="og:description" content="Daily weigh-ins in, weekly averages and the real trend out.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<div class="wrap">
+<header class="site"><a class="brand" href="/"><i></i>Temperbyte</a><nav><a href="/escalation-clause-calculator/">Escalation</a><a href="/weight-trend-calculator/">Weight trend</a></nav></header>
+
+<h1>Weight trend calculator</h1>
+<p class="lede">Daily weigh-ins jump around with water, salt and sleep. Paste them here to see the weekly averages and the trend underneath.</p>
+
+<form class="tool" id="f" autocomplete="off" onsubmit="return false">
+  <fieldset>
+    <label for="w">Daily weigh-ins, oldest first, one per line. Write a dash for a missed day.</label>
+    <textarea id="w" spellcheck="false">84.2
+83.6
+84.0
+83.1
+83.9
+84.4
+83.5
+83.4
+83.0
+-
+82.8
+83.6
+83.3
+82.7
+82.9
+82.4
+82.8
+82.1
+82.6
+-
+82.0</textarea>
+  </fieldset>
+  <fieldset>
+    <div class="grid">
+      <div><label for="unit">Unit</label><select id="unit"><option>kg</option><option>lb</option></select></div>
+      <div><label for="goal">Goal</label><select id="goal"><option value="loss">Lose weight</option><option value="gain">Gain weight</option><option value="maintain">Maintain</option></select></div>
+    </div>
+  </fieldset>
+  <div class="result" id="out" aria-live="polite"></div>
+</form>
+
+<h2>Why weekly averages beat daily weigh-ins</h2>
+<p>A single weigh-in can move by a kilo or more overnight from water, salt, carbohydrates, sleep, stress or the menstrual cycle. None of that is fat. Averaging every weigh-in in a week cancels most of the noise, so comparing one week's average with the next shows the real direction.</p>
+<h3>How the numbers are calculated</h3>
+<ul>
+<li><strong>Weekly average:</strong> the mean of the weigh-ins logged in each 7-day block. Missed days are skipped, not filled in.</li>
+<li><strong>Weekly change:</strong> this week's average minus last week's, in your unit and as a percent of last week's average.</li>
+<li><strong>Average rate:</strong> the change from the first full week to the last, divided by the number of weeks between them.</li>
+<li><strong>Trend line:</strong> a 7-day rolling average of the logged days.</li>
+</ul>
+<h3>What rate is reasonable?</h3>
+<p>For fat loss, many coaches aim for roughly 0.5–1% of body weight per week, and slower for leaner clients. A faster rate for several weeks deserves a check-in about energy, training and how the client is eating. For muscle gain, a much slower rate is common. These are general reference points, not targets for any one person.</p>
+<h3>Before changing the plan</h3>
+<p>Look at at least two weeks of averages and at adherence first. If the client hit their targets and the trend is still off for two weeks, change one thing by a small amount. If adherence was low, the conversation is about what got in the way, not a new number.</p>
+<p class="note">This tool does arithmetic on the numbers you enter. It is not medical advice. Dizziness, fainting, guilt around food, skipping meals to compensate or exercising far beyond the plan are reasons to talk to a professional, not to adjust a target.</p>
+
+<div class="cta">
+  <p><strong>Reviewing check-ins every week?</strong> The Check-in Analyzer skill for Claude does this math from a pasted check-in, plus adherence counts, a hold, adjust or review decision with the reason, red flags, and a ready-to-send reply in your voice.</p>
+  <a class="btn" href="https://payhip.com/b/7gC9P">See Check-in Analyzer</a>
+  <p class="note" style="margin-top:12px">Or try the <a href="https://payhip.com/b/MOo7j">free lite version</a>.</p>
+</div>
+
+<footer class="site">Made by Temperbyte. Free tools and Claude skills for real estate agents and fitness coaches. <a href="https://payhip.com/Temperbyte">Store</a> · <a href="https://github.com/Temperbyte/temperbyte-skills.">Free skills on GitHub</a></footer>
+</div>
+
+<script>
+const $=s=>document.querySelector(s);
+const f1=x=>(Math.round(x*10)/10).toFixed(1);
+const f2=x=>(Math.round(x*100)/100).toFixed(2);
+const sgn=(x,d=2)=>{x=Number(x);return (x>0?'+':x<0?'−':'')+Math.abs(x).toFixed(d)};
+function parse(t){
+  return t.split(/[\n,;]+/).map(s=>s.trim()).filter(s=>s!=='').map(s=>{const x=parseFloat(s.replace(',','.'));return isFinite(x)&&x>0?x:null});
+}
+function calc(){
+  const u=$('#unit').value, goal=$('#goal').value, out=$('#out');
+  const days=parse($('#w').value);
+  const logged=days.filter(x=>x!==null);
+  if(logged.length<4){out.innerHTML='<p class="note">Enter at least a week of weigh-ins to see a trend.</p>';return}
+  const weeks=[];
+  for(let i=0;i<days.length;i+=7){const blk=days.slice(i,i+7);const v=blk.filter(x=>x!==null);weeks.push({n:blk.length,logged:v.length,avg:v.length?v.reduce((a,b)=>a+b,0)/v.length:null,min:v.length?Math.min(...v):null,max:v.length?Math.max(...v):null})}
+  const full=weeks.filter(w=>w.n===7&&w.logged>=4);
+  let rows='',prev=null;
+  weeks.forEach((w,i)=>{
+    let ch='—';
+    if(w.avg!==null&&prev!==null&&prev.avg!==null){const d=w.avg-prev.avg;ch=`${sgn(d)} ${u} (${sgn(d/prev.avg*100)}%)`}
+    rows+=`<tr><td>Week ${i+1}${w.n<7?' (partial)':''}</td><td class="n">${w.logged} of ${w.n}</td><td class="n">${w.avg===null?'—':f2(w.avg)+' '+u}</td><td class="n">${w.min===null?'—':f1(w.max-w.min)+' '+u}</td><td class="n">${ch}</td></tr>`;
+    prev=w;
+  });
+  let head='',notes=[];
+  if(full.length>=2){
+    const a=full[0],b=full[full.length-1];
+    const iA=weeks.indexOf(a),iB=weeks.indexOf(b);
+    const rate=(b.avg-a.avg)/(iB-iA), pct=rate/a.avg*100;
+    const dir=rate<0?'down':rate>0?'up':'flat';
+    head=`Trend: <b>${sgn(rate)} ${u} per week</b> (${sgn(pct)}% of body weight)`;
+    const ap=Math.abs(pct);
+    if(goal==='loss'){
+      if(rate>=0) notes.push('The weekly averages are not going down. Check adherence before changing anything.');
+      else if(ap>1) notes.push('That is faster than the 0.5–1% per week many coaches aim for. Worth a check-in about energy, training and how eating is going.');
+      else if(ap<0.25) notes.push('Slow but moving down. If adherence is good and this holds for another week, a small change may be worth considering.');
+      else notes.push('Within a pace many coaches consider sustainable for fat loss.');
+    } else if(goal==='gain'){
+      if(rate<=0) notes.push('The weekly averages are not going up. Check adherence before changing anything.');
+      else notes.push('Moving up. For muscle gain, many coaches aim for a slow rate to limit fat gain.');
+    } else {
+      notes.push(ap<0.25?'Stable: the averages are holding within a quarter percent per week.':`The averages are moving ${dir} by more than a quarter percent per week.`);
+    }
+  } else head='Two full weeks are needed for a trend. Here is what you have so far.';
+  const partial=weeks.find(w=>w.n<7); if(partial) notes.push('The last week is partial, so it is left out of the trend.');
+  notes.push(`The biggest single-week swing between the highest and lowest weigh-in was ${f1(Math.max(...weeks.filter(w=>w.min!==null).map(w=>w.max-w.min)))} ${u}. That is the day-to-day noise the averages remove.`);
+  // chart: daily dots + 7-day rolling average
+  const W=720,H=220,P=32;
+  const vals=logged, lo=Math.min(...vals), hi=Math.max(...vals), pad=(hi-lo)*.15||0.5;
+  const y=v=>P/2+(H-P)*(1-(v-(lo-pad))/((hi+pad)-(lo-pad)));
+  const x=i=>P+(W-P*1.5)*(days.length>1?i/(days.length-1):0);
+  let dots='',line=[];
+  days.forEach((v,i)=>{if(v!==null)dots+=`<circle cx="${x(i).toFixed(1)}" cy="${y(v).toFixed(1)}" r="3" fill="var(--muted)" opacity=".55"/>`;
+    const win=days.slice(Math.max(0,i-6),i+1).filter(z=>z!==null); if(i>=6&&win.length>=4)line.push(`${x(i).toFixed(1)},${y(win.reduce((a,b)=>a+b,0)/win.length).toFixed(1)}`)});
+  const svg=`<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Daily weigh-ins with a 7-day rolling average">
+   <text x="0" y="${y(hi)+4}" font-size="12" fill="var(--muted)">${f1(hi)}</text><text x="0" y="${y(lo)+4}" font-size="12" fill="var(--muted)">${f1(lo)}</text>
+   <line x1="${P}" x2="${W-P/2}" y1="${H-P/2}" y2="${H-P/2}" stroke="var(--rule)"/>
+   ${dots}${line.length>1?`<polyline points="${line.join(' ')}" fill="none" stroke="var(--rust)" stroke-width="2.5" stroke-linejoin="round"/>`:''}</svg>
+   <p class="note">Dots: daily weigh-ins. Line: 7-day rolling average.</p>`;
+  out.innerHTML=`<p class="headline">${head}</p>${svg}
+  <table><thead><tr><th>Week</th><th class="n">Logged</th><th class="n">Average</th><th class="n">Daily swing</th><th class="n">Change</th></tr></thead><tbody>${rows}</tbody></table>
+  ${notes.map(t=>`<p class="note">${t}</p>`).join('')}`;
+}
+document.addEventListener('input',calc);document.addEventListener('change',calc);
+calc();
+</script>
+</body>
+</html>
