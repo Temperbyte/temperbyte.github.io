@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Appraisal Gap Calculator: Buyer Cash, Gap Coverage and Seller Options</title>
+<meta name="description" content="Free appraisal gap calculator for agents. Enter the contract price, appraised value, down payment and any appraisal gap coverage, and see the buyer's cash to close and the seller's price in every outcome.">
+<link rel="canonical" href="https://temperbyte.github.io/appraisal-gap-calculator/">
+<meta property="og:title" content="Appraisal Gap Calculator">
+<meta property="og:description" content="The appraisal came in low. What does each way out cost the buyer and the seller?">
+<meta property="og:image" content="https://temperbyte.github.io/assets/social/14-appraisal-gap.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<div class="wrap">
+<header class="site"><a class="brand" href="/"><i></i>Temperbyte</a><nav><a href="/">Free tools</a><a href="https://payhip.com/Temperbyte">Store</a></nav></header>
+
+<h1>Appraisal gap calculator</h1>
+<p class="lede">The appraisal came in below the contract price. See what each way out costs the buyer in cash and the seller in price, side by side.</p>
+
+<form class="tool" id="f" autocomplete="off" onsubmit="return false">
+  <fieldset>
+    <div class="grid">
+      <div><label for="p">Contract price ($)</label><input id="p" inputmode="decimal" value="500000"></div>
+      <div><label for="a">Appraised value ($)</label><input id="a" inputmode="decimal" value="485000"></div>
+      <div><label for="d">Down payment (%)</label><input id="d" inputmode="decimal" value="20"></div>
+      <div><label for="c">Appraisal gap coverage in the offer ($)</label><input id="c" inputmode="decimal" placeholder="none" value="10000"></div>
+      <div><label for="cash">Buyer's cash available ($, optional)</label><input id="cash" inputmode="decimal" placeholder="unknown" value="110000"></div>
+    </div>
+  </fieldset>
+  <div class="result" id="out" aria-live="polite"></div>
+</form>
+
+<h2>How the appraisal gap is calculated</h2>
+<p>The gap is the contract price minus the appraised value. Most lenders base the loan on the lower of the two, so the loan shrinks when the appraisal is low, and the buyer's cash has to cover both the gap and part of the down payment.</p>
+<ul>
+<li><strong>Loan</strong> = the lower of price and appraised value × (100% − down payment %).</li>
+<li><strong>Buyer's cash to close</strong> (before closing costs) = final price − loan.</li>
+<li><strong>Extra cash because of the gap</strong> = loan-to-value × gap. With 20% down and a $15,000 gap, the buyer brings $12,000 more than planned if they cover the whole gap. Their 20% is now figured on the lower appraised value, so the extra is a bit less than the gap itself.</li>
+</ul>
+<h3>The usual ways out</h3>
+<ul>
+<li><strong>Appraisal gap coverage:</strong> the buyer agreed in the offer to pay up to a set amount above the appraisal. The price becomes the appraised value plus the covered part.</li>
+<li><strong>Buyer covers the whole gap:</strong> the price stays, and the buyer brings more cash.</li>
+<li><strong>Seller drops to the appraised value:</strong> the buyer's cash stays at the planned down payment on the lower price.</li>
+<li><strong>Split the difference:</strong> often where the negotiation lands.</li>
+</ul>
+<p class="note">Estimates only, before closing costs, credits and prepaid items. Not lending or legal advice. FHA, VA and some other loans have their own appraisal rules, and the contract wording decides what each side must do. Check with the lender.</p>
+
+<div class="cta">
+  <p><strong>Several offers with different gap clauses?</strong> The Offer Comparison skill for Claude puts every offer side by side: net to seller, escalation math, appraisal gap exposure, financing and contingency risk, and a plain-language summary for the seller.</p>
+  <a class="btn" href="https://payhip.com/b/sfl8H">See Offer Comparison</a>
+  <p class="note" style="margin-top:12px">Comparing escalating offers? Try the free <a href="/escalation-clause-calculator/">escalation clause calculator</a>.</p>
+</div>
+
+<figure class="share"><img src="../assets/social/14-appraisal-gap.png" alt="Appraisal gap calculator: buyer cash and seller price in every outcome" width="200" height="300"><figcaption class="note">Useful? Save it to Pinterest or share the link with a colleague.</figcaption></figure>
+
+<footer class="site">Made by Temperbyte. Free tools and Claude skills for real estate agents and fitness coaches. <a href="https://payhip.com/Temperbyte">Store</a> · <a href="https://github.com/Temperbyte/temperbyte-skills.">Free skills on GitHub</a> · <a href="https://www.pinterest.com/temperbyte/">Pinterest</a> · <a href="https://x.com/Temperbyte_AI">X</a> · <a href="https://www.tiktok.com/@temperbyte_skills">TikTok</a></footer>
+</div>
+
+<script>
+const $=s=>document.querySelector(s);
+const money=n=>(n<0?'−$':'$')+Math.round(Math.abs(n)).toLocaleString('en-US');
+const sgn=n=>n===0?'$0':(n>0?'+':'−')+'$'+Math.round(Math.abs(n)).toLocaleString('en-US');
+const val=id=>{const t=String($(id).value).replace(/[$,\s%]/g,'');if(t==='')return null;const x=parseFloat(t);return isFinite(x)&&x>=0?x:null};
+function calc(){
+  const out=$('#out'), P=val('#p'), A=val('#a'), D=val('#d'), C=val('#c')||0, cash=val('#cash');
+  if(!P||!A){out.innerHTML='<p class="note">Enter the contract price and the appraised value.</p>';return}
+  if(D===null||D>100){out.innerHTML='<p class="note">Enter the down payment as a percent from 0 to 100.</p>';return}
+  const L=1-D/100, G=P-A, planned=P*(1-L);
+  if(G<=0){
+    out.innerHTML=`<p class="headline">No appraisal gap: <b>the appraisal is ${G===0?'equal to':money(-G)+' above'} the price</b></p>
+    <p>The loan is based on the contract price: ${money(P*L)}. The buyer's cash to close stays at the planned ${money(planned)} (before closing costs).</p>`;return}
+  const loan=A*L;
+  const rows=[];
+  const add=(name,price,note)=>rows.push({name,price,cash:price-loan,note});
+  if(C>0) add(`Gap coverage clause (${money(C)})`,A+Math.min(C,G),C>=G?'Clause covers the whole gap.':`Covers ${money(C)}; ${money(G-C)} still open.`);
+  add('Buyer covers the whole gap',P,'');
+  add('Seller drops to the appraisal',A,'');
+  add('Split the difference',A+G/2,'');
+  const tr=rows.map(r=>{const over=cash!==null&&r.cash>cash;return `<tr><td>${r.name}${r.note?`<br><span class="note">${r.note}</span>`:''}</td><td class="n">${money(r.price)}</td><td class="n">${money(r.cash)}${over?' <span class="note">(over budget)</span>':''}</td><td class="n">${sgn(r.cash-planned)}</td><td class="n">${sgn(r.price-P)}</td></tr>`}).join('');
+  let notes=[`Loan: lower of price and appraisal, ${money(A)} × ${(L*100).toFixed(1).replace(/\.0$/,'')}% = ${money(loan)}. Planned cash before the appraisal: ${money(planned)}.`];
+  notes.push(`If the buyer covers the whole gap, the extra cash is ${(L*100).toFixed(1).replace(/\.0$/,'')}% × ${money(G)} = ${money(L*G)}.`);
+  if(cash!==null){const ok=rows.filter(r=>r.cash<=cash).map(r=>r.name);notes.push(ok.length?`With ${money(cash)} available, the buyer can afford: ${ok.join(', ').toLowerCase()}.`:`With ${money(cash)} available, none of these outcomes fits the buyer's cash before closing costs.`)}
+  out.innerHTML=`<p class="headline">Appraisal gap: <b>${money(G)}</b> (${(G/P*100).toFixed(1)}% of the price)</p>
+  <div class="scroll"><table><thead><tr><th>Outcome</th><th class="n">Final price</th><th class="n">Buyer cash</th><th class="n">vs. planned</th><th class="n">Seller price change</th></tr></thead><tbody>${tr}</tbody></table></div>
+  ${notes.map(t=>`<p class="note">${t}</p>`).join('')}`;
+}
+document.addEventListener('input',calc);calc();
+</script>
+</body>
+</html>

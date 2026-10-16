@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MLS Remarks Checker: Character Count and Fair Housing Word Check for Listings</title>
+<meta name="description" content="Free MLS remarks checker for real estate agents. Paste your listing description to count characters against your MLS limit and flag phrases that can cause fair housing trouble, with what to write instead.">
+<link rel="canonical" href="https://temperbyte.github.io/mls-remarks-checker/">
+<meta property="og:title" content="MLS Remarks Checker">
+<meta property="og:description" content="Character count and a fair housing word check for listing descriptions.">
+<meta property="og:image" content="https://temperbyte.github.io/assets/social/15-mls-remarks-checker.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/site.css">
+<style>
+.preview{background:var(--paper);border:1px solid var(--rule);padding:12px 14px;margin:8px 0 14px;white-space:pre-wrap;overflow-wrap:anywhere}
+mark{background:transparent;color:inherit;border-bottom:2px solid var(--rust);font-weight:600}
+mark.weak{border-bottom-style:dashed;font-weight:500}
+.flags li{margin-bottom:10px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="site"><a class="brand" href="/"><i></i>Temperbyte</a><nav><a href="/">Free tools</a><a href="https://payhip.com/Temperbyte">Store</a></nav></header>
+
+<h1>MLS remarks checker</h1>
+<p class="lede">Paste your listing description. You get the character count against your MLS limit and every phrase that can cause fair housing trouble, with what to write instead.</p>
+
+<form class="tool" id="f" autocomplete="off" onsubmit="return false">
+  <fieldset>
+    <label for="t">Public remarks</label>
+    <textarea id="t" spellcheck="true">Welcome home! This charming 3 bedroom, 2 bath ranch is perfect for families, on a quiet street in a safe neighborhood with great schools. Updated kitchen (2022) with quartz counters, new roof (2021), and a fenced backyard. Walk to church and Cedar Park.</textarea>
+  </fieldset>
+  <fieldset>
+    <div class="grid">
+      <div><label for="lim">Character limit</label><input id="lim" inputmode="numeric" value="1000"></div>
+    </div>
+  </fieldset>
+  <div class="result" id="out" aria-live="polite"></div>
+</form>
+
+<h2>What the checker flags</h2>
+<p>Describe the property, not the people who should live in it. The checker looks for four kinds of phrases that fair housing guidance warns about, plus a few weak openers:</p>
+<ul>
+<li><strong>Says who should buy:</strong> "perfect for families", "ideal for young professionals", "great for retirees", "empty nesters", "bachelor pad". Write the features behind the claim: "3 bedrooms on one level", "fenced backyard".</li>
+<li><strong>Describes the neighborhood's people or safety:</strong> "safe neighborhood", "exclusive", "family neighborhood". Use facts you can verify, such as the distance to a named park or transit stop.</li>
+<li><strong>Rates schools:</strong> "great schools", "top-rated district". Name a school only if you know it, and let buyers judge it.</li>
+<li><strong>Religious landmarks as selling points:</strong> "walk to church", "near synagogue".</li>
+<li><strong>Weak openers</strong> (not a legal issue): "Welcome home", "Don't miss", "Look no further". Open with the home's strongest feature instead.</li>
+</ul>
+<h3>What is fine</h3>
+<p>Facts about the property and the area: "0.4 miles to Cedar Park", "family room" as the name of a room, and accessibility features stated plainly, such as "no-step entry" or "grab bars in the primary bath".</p>
+<h3>Character limits</h3>
+<p>Each MLS sets its own limit for public remarks, and some count spaces while others do not. Check yours and enter it above. The count updates as you type.</p>
+<p class="note">A first-pass word check, not legal review. It can't judge context, and no list catches everything. Under US federal law the protected classes are race, color, religion, sex, disability, familial status and national origin; state and local laws often add more. Follow your brokerage's policy.</p>
+
+<div class="cta">
+  <p><strong>Writing listings every week?</strong> The Listing Writer skill for Claude turns rough property notes into MLS remarks, headlines, a website description and a social caption, with this fair housing check built in and a list of facts to verify before you publish.</p>
+  <a class="btn" href="https://payhip.com/b/60TYy">See Listing Writer</a>
+  <p class="note" style="margin-top:12px">Or try the <a href="https://payhip.com/b/eT2ON">free lite version</a>.</p>
+</div>
+
+<figure class="share"><img src="../assets/social/15-mls-remarks-checker.png" alt="MLS remarks checker: character count and fair housing word check" width="200" height="300"><figcaption class="note">Useful? Save it to Pinterest or share the link with a colleague.</figcaption></figure>
+
+<footer class="site">Made by Temperbyte. Free tools and Claude skills for real estate agents and fitness coaches. <a href="https://payhip.com/Temperbyte">Store</a> · <a href="https://github.com/Temperbyte/temperbyte-skills.">Free skills on GitHub</a> · <a href="https://www.pinterest.com/temperbyte/">Pinterest</a> · <a href="https://x.com/Temperbyte_AI">X</a> · <a href="https://www.tiktok.com/@temperbyte_skills">TikTok</a></footer>
+</div>
+
+<script>
+const $=s=>document.querySelector(s);
+const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const GROUPS=[
+ {k:'who',name:'Says who should buy',fix:'Write the features behind the claim, for example "3 bedrooms on one level" or "fenced backyard".',
+  p:['perfect for families','perfect for a family','ideal for families','great for families','perfect for young families','perfect for young professionals','ideal for young professionals','great for young professionals','perfect for retirees','ideal for retirees','great for retirees','perfect for a couple','perfect for couples','ideal for a couple','perfect for singles','perfect for newlyweds','empty nesters','empty nester','empty-nester','empty-nesters','bachelor pad','adults only','adult community','no children','no kids','mature couple','perfect starter home for a young couple']},
+ {k:'area',name:"Describes the neighborhood's people or safety",fix:'Use facts you can verify: distances to named parks, trails, shops or transit.',
+  p:['safe neighborhood','safe area','safe community','safe street','crime-free','crime free','low crime','exclusive neighborhood','exclusive community','exclusive','family neighborhood','family-friendly neighborhood','family friendly neighborhood','family community','quiet street of retirees','integrated neighborhood','integrated','ethnic neighborhood','ethnic','diverse neighborhood','diverse community','traditional neighborhood']},
+ {k:'school',name:'Rates schools',fix:'Name the school or district only if you know it, and leave the judging to buyers.',
+  p:['great schools','great school district','top-rated schools','top rated schools','top-rated district','top rated district','top-rated school district','best schools','best school district','excellent schools','excellent school district','good schools','award-winning schools','award winning schools','highly rated schools','sought-after schools','sought after school district']},
+ {k:'faith',name:'Religious landmark as a selling point',fix:'Leave it out, or use a neutral landmark such as a park or transit stop.',
+  p:['walk to church','walking distance to church','close to church','near church','near churches','near the church','walk to synagogue','near synagogue','near the synagogue','walk to mosque','near mosque','near the mosque','near temple','christian neighborhood','jewish neighborhood','catholic neighborhood','muslim neighborhood']},
+ {k:'weak',name:'Weak opener (not a legal issue)',fix:"Open with the home's strongest feature instead.",
+  p:['welcome home','don\'t miss','dont miss','look no further','must see','must-see','won\'t last','wont last']}
+];
+// longest phrases first, so "safe neighborhood" wins over a shorter overlap
+const ALL=GROUPS.flatMap(g=>g.p.map(p=>({p,g}))).sort((a,b)=>b.p.length-a.p.length);
+const rx=p=>new RegExp('(^|[^A-Za-z])('+p.replace(/[.*+?^${}()|[\]\\]/g,'\\$&').replace(/'/g,"['’]").replace(/[- ]/g,'[- ]')+')(?![A-Za-z])','gi');
+function find(text){
+  const hits=[];
+  for(const {p,g} of ALL){
+    const r=rx(p);let m;
+    while((m=r.exec(text))){
+      const s=m.index+m[1].length,e=s+m[2].length;
+      if(!hits.some(h=>s<h.e&&e>h.s)) hits.push({s,e,txt:m[2],g});
+      r.lastIndex=e;
+    }
+  }
+  // "exclusive" and "integrated" alone are flagged only when describing the area, not e.g. "integrated appliances"
+  return hits.filter(h=>{const w=h.txt.toLowerCase();if(w!=='integrated'&&w!=='exclusive'&&w!=='ethnic')return true;
+    const after=text.slice(h.e,h.e+30).toLowerCase();return !/^\s*(appliance|dishwasher|fridge|refrigerator|oven|microwave|speaker|lighting|storage|use|listing|agent|right)/.test(after)}).sort((a,b)=>a.s-b.s);
+}
+function calc(){
+  const text=$('#t').value, lim=parseInt($('#lim').value,10)||0, out=$('#out');
+  const n=text.length, ns=text.replace(/\s/g,'').length, words=(text.match(/\S+/g)||[]).length;
+  const hits=find(text);
+  let pv='',i=0;
+  for(const h of hits){pv+=esc(text.slice(i,h.s))+`<mark class="${h.g.k==='weak'?'weak':''}">${esc(text.slice(h.s,h.e))}</mark>`;i=h.e}
+  pv+=esc(text.slice(i));
+  const legal=hits.filter(h=>h.g.k!=='weak'), weak=hits.filter(h=>h.g.k==='weak');
+  const head=!text.trim()?'Paste your remarks above.':legal.length?`<b>${legal.length} phrase${legal.length>1?'s':''} to rewrite</b>${weak.length?`, ${weak.length} weak opener${weak.length>1?'s':''}`:''}`:`<b>No flagged phrases</b>${weak.length?`, ${weak.length} weak opener${weak.length>1?'s':''}`:''}`;
+  const over=lim>0&&n>lim;
+  const byG=GROUPS.map(g=>({g,list:[...new Set(hits.filter(h=>h.g===g).map(h=>'“'+h.txt+'”'))]})).filter(x=>x.list.length);
+  out.innerHTML=`<p class="headline">${head}</p>
+  <p>${n.toLocaleString('en-US')} characters${lim?` of ${lim.toLocaleString('en-US')}`:''} (${ns.toLocaleString('en-US')} without spaces), ${words} word${words===1?'':'s'}. ${lim?(over?`<b style="color:var(--rust)">${(n-lim).toLocaleString('en-US')} over the limit.</b>`:`${(lim-n).toLocaleString('en-US')} left.`):''}</p>
+  ${hits.length?`<div class="preview">${pv}</div>`:''}
+  ${byG.length?`<ul class="flags">${byG.map(x=>`<li><strong>${x.g.name}:</strong> ${x.list.map(esc).join(', ')}. <span class="note">${x.g.fix}</span></li>`).join('')}</ul>`:''}
+  ${text.trim()?'<p class="note">A first-pass word check, not legal review. Read the whole text with fair housing in mind as well.</p>':''}`;
+}
+document.addEventListener('input',calc);calc();
+</script>
+</body>
+</html>

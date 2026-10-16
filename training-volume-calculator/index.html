@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Training Volume Calculator: Weekly Sets Per Muscle Group From a Program</title>
+<meta name="description" content="Free weekly training volume calculator for coaches. Enter a program's exercises and get the weekly hard sets for each muscle group, compared with common ranges for beginners, intermediates and advanced lifters.">
+<link rel="canonical" href="https://temperbyte.github.io/training-volume-calculator/">
+<meta property="og:title" content="Training Volume Calculator">
+<meta property="og:description" content="A program in, weekly sets per muscle group out.">
+<meta property="og:image" content="https://temperbyte.github.io/assets/social/16-training-volume.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/site.css">
+<style>.bar{height:10px;background:var(--rule);position:relative;min-width:120px}.bar i{position:absolute;top:0;bottom:0;background:var(--muted);opacity:.35}.bar b{position:absolute;top:-3px;bottom:-3px;width:3px;background:var(--rust)}</style>
+</head>
+<body>
+<div class="wrap">
+<header class="site"><a class="brand" href="/"><i></i>Temperbyte</a><nav><a href="/">Free tools</a><a href="https://payhip.com/Temperbyte">Store</a></nav></header>
+
+<h1>Training volume calculator</h1>
+<p class="lede">Enter a program's exercises. You get the weekly hard sets for each muscle group, and which ones sit below, inside or above a common range for the lifter's level.</p>
+
+<form class="tool" id="f" autocomplete="off" onsubmit="return false">
+  <fieldset>
+    <div class="grid">
+      <div><label for="lvl">Lifter's level</label><select id="lvl"><option value="b" selected>Beginner</option><option value="i">Intermediate</option><option value="a">Advanced</option></select></div>
+    </div>
+  </fieldset>
+  <fieldset>
+    <legend>Exercises</legend>
+    <div id="rows"></div>
+    <div class="actions"><button type="button" id="add">Add an exercise</button></div>
+  </fieldset>
+  <div class="result" id="out" aria-live="polite"></div>
+</form>
+
+<h2>How weekly volume is counted</h2>
+<ul>
+<li><strong>Hard sets only:</strong> working sets taken reasonably close to failure. Warm-up sets don't count.</li>
+<li><strong>Weekly sets</strong> = sets per session × sessions per week.</li>
+<li><strong>Primary muscle</strong> gets every set. A <strong>secondary muscle</strong> gets half a set, for example the triceps on a bench press. This is a common counting convention; some coaches count secondary work as a full set or not at all.</li>
+<li>One-arm or one-leg exercises: enter the sets for one side. Both sides get that many sets.</li>
+</ul>
+<h3>The ranges used here</h3>
+<p>The ranges follow common coaching guidelines for hard sets per muscle group per week: about 6–10 for beginners, 10–16 for intermediates and 12–20 for advanced lifters. They are starting points, not rules. Recovery, sleep, stress, age and the client's goal all move the right number, and a muscle the client isn't prioritizing can sit lower.</p>
+<h3>Reading the result</h3>
+<p>A muscle far below the range for weeks is likely to lag. One far above it may stop recovering between sessions, especially if performance or sleep is dropping. Change volume a little at a time, for example two sets per week for a muscle, and watch the training log.</p>
+<p class="note">General training math, not medical advice. Clients with pain, injuries or health conditions need a qualified professional's input before volume goes up.</p>
+
+<div class="cta">
+  <p><strong>Building programs for new clients?</strong> The Intake to Program skill for Claude turns an intake form into a safety screen, a client summary and a first 4-week program that fits the client's days, session length, equipment and injuries, with the weekly volume per muscle group worked out.</p>
+  <a class="btn" href="https://payhip.com/b/gVueK">See Intake to Program</a>
+  <p class="note" style="margin-top:12px">Progressing the sets week to week? Try the free <a href="/progressive-overload-calculator/">progressive overload calculator</a>.</p>
+</div>
+
+<figure class="share"><img src="../assets/social/16-training-volume.png" alt="Training volume calculator: weekly sets per muscle group" width="200" height="300"><figcaption class="note">Useful? Save it to Pinterest or share the link with a colleague.</figcaption></figure>
+
+<footer class="site">Made by Temperbyte. Free tools and Claude skills for real estate agents and fitness coaches. <a href="https://payhip.com/Temperbyte">Store</a> · <a href="https://github.com/Temperbyte/temperbyte-skills.">Free skills on GitHub</a> · <a href="https://www.pinterest.com/temperbyte/">Pinterest</a> · <a href="https://x.com/Temperbyte_AI">X</a> · <a href="https://www.tiktok.com/@temperbyte_skills">TikTok</a></footer>
+</div>
+
+<script>
+const $=s=>document.querySelector(s);
+const MUSCLES=['Chest','Back','Shoulders','Biceps','Triceps','Quads','Hamstrings','Glutes','Calves','Abs'];
+const RANGE={b:[6,10],i:[10,16],a:[12,20]};
+const defaults=[
+ ['Bench press',3,2,'Chest','Triceps'],['Barbell row',3,2,'Back','Biceps'],['Overhead press',3,1,'Shoulders','Triceps'],
+ ['Lat pulldown',3,2,'Back','Biceps'],['Squat',3,2,'Quads','Glutes'],['Romanian deadlift',3,2,'Hamstrings','Glutes'],
+ ['Lateral raise',3,2,'Shoulders',''],['Dumbbell curl',2,2,'Biceps',''],['Triceps pushdown',2,2,'Triceps',''],
+ ['Calf raise',3,2,'Calves',''],['Plank',2,2,'Abs','']
+];
+const opts=(sel,none)=>(none?`<option value="">none</option>`:'')+MUSCLES.map(m=>`<option${m===sel?' selected':''}>${m}</option>`).join('');
+function addRow(r=['',3,1,'Chest','']){
+  const d=document.createElement('div');d.className='offer ex';
+  d.innerHTML=`<div class="offer-head"><span>Exercise</span><button type="button" class="link rm">Remove</button></div>
+  <div class="grid">
+   <div><label>Name</label><input class="nm" value="${r[0]}"></div>
+   <div><label>Sets per session</label><input class="sets" inputmode="decimal" value="${r[1]}"></div>
+   <div><label>Sessions per week</label><input class="days" inputmode="decimal" value="${r[2]}"></div>
+   <div><label>Primary muscle</label><select class="pri">${opts(r[3],false)}</select></div>
+   <div><label>Secondary muscle</label><select class="sec">${opts(r[4],true)}</select></div>
+  </div>`;
+  d.querySelector('.rm').onclick=()=>{d.remove();calc()};
+  $('#rows').appendChild(d);
+}
+defaults.forEach(addRow);
+$('#add').onclick=()=>{addRow();calc()};
+const num=v=>{const x=parseFloat(String(v).replace(',','.'));return isFinite(x)&&x>=0?x:0};
+const f1=x=>Number.isInteger(x)?String(x):x.toFixed(1);
+function calc(){
+  const lvl=$('#lvl').value,[lo,hi]=RANGE[lvl],out=$('#out');
+  const tot=Object.fromEntries(MUSCLES.map(m=>[m,0])), src=Object.fromEntries(MUSCLES.map(m=>[m,[]]));
+  let n=0;
+  document.querySelectorAll('.ex').forEach(d=>{
+    const w=num(d.querySelector('.sets').value)*num(d.querySelector('.days').value);
+    if(!w)return; n++;
+    const nm=d.querySelector('.nm').value.trim()||'Exercise', p=d.querySelector('.pri').value, s=d.querySelector('.sec').value;
+    tot[p]+=w; src[p].push(`${nm} ${f1(w)}`);
+    if(s&&s!==p){tot[s]+=w/2; src[s].push(`${nm} ${f1(w/2)}`)}
+  });
+  if(!n){out.innerHTML='<p class="note">Enter at least one exercise with sets and sessions.</p>';return}
+  const max=Math.max(hi+6,...Object.values(tot));
+  const status=v=>v<lo?'below':v>hi?'above':'in range';
+  const rows=MUSCLES.map(m=>{const v=tot[m];return `<tr><td>${m}</td><td class="n">${f1(v)}</td><td>${status(v)}</td><td><div class="bar"><i style="left:${lo/max*100}%;width:${(hi-lo)/max*100}%"></i><b style="left:calc(${Math.min(v/max,1)*100}% - 1px)"></b></div></td><td class="note">${src[m].join(', ')||'—'}</td></tr>`}).join('');
+  const below=MUSCLES.filter(m=>tot[m]<lo), above=MUSCLES.filter(m=>tot[m]>hi), zero=MUSCLES.filter(m=>tot[m]===0);
+  const total=Object.values(tot).reduce((a,b)=>a+b,0), direct=[...document.querySelectorAll('.ex')].reduce((a,d)=>a+num(d.querySelector('.sets').value)*num(d.querySelector('.days').value),0);
+  const notes=[];
+  if(zero.length) notes.push(`No sets at all for: ${zero.join(', ')}. Fine if it's on purpose; otherwise add an exercise.`);
+  if(below.length) notes.push(`Below the ${lo}–${hi} range: ${below.filter(m=>!zero.includes(m)).join(', ')||'only the ones with no sets'}.`);
+  if(above.length) notes.push(`Above the range: ${above.join(', ')}. Check that the client recovers between sessions.`);
+  if(!below.length&&!above.length) notes.push(`Every muscle group is inside the ${lo}–${hi} range.`);
+  out.innerHTML=`<p class="headline">${MUSCLES.length-below.length-above.length} of ${MUSCLES.length} muscle groups <b>in the ${lo}–${hi} range</b></p>
+  <p>${f1(direct)} working sets per week in total.</p>
+  <div class="scroll"><table><thead><tr><th>Muscle</th><th class="n">Sets/week</th><th>Range</th><th></th><th>From</th></tr></thead><tbody>${rows}</tbody></table></div>
+  ${notes.map(t=>`<p class="note">${t}</p>`).join('')}
+  <p class="note">Shaded band: the ${lo}–${hi} range for this level. Line: this program.</p>`;
+}
+document.addEventListener('input',calc);document.addEventListener('change',calc);calc();
+</script>
+</body>
+</html>

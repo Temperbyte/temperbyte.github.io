@@ -14,29 +14,11 @@ nothing sent anywhere. Never invent statistics or legal rules; when a convention
 - [x] 2026-10-16 Price reduction calculator → Seller Update (https://payhip.com/b/UXnhj)
 - [x] 2026-10-16 Progressive overload calculator → Program Progression (https://payhip.com/b/gpAwi)
 
+- [x] 2026-10-16 Appraisal gap calculator → Offer Comparison (https://payhip.com/b/sfl8H)
+- [x] 2026-10-16 MLS remarks checker → Listing Writer (https://payhip.com/b/60TYy)
+- [x] 2026-10-16 Training volume calculator → Intake to Program (https://payhip.com/b/gVueK)
+
 ## Next (in this order)
-
-- [ ] **Appraisal gap calculator** (`/appraisal-gap-calculator/`) → Offer Comparison (https://payhip.com/b/sfl8H). Agents.
-  Inputs: contract price P, appraised value A, loan-to-value L (%, from down payment), appraisal gap coverage C ($, 0 if none), optional buyer cash available.
-  Math: gap G = max(0, P − A). Loan = min(P, A) × L. Cash to close before closing costs = P − loan. Planned cash if no gap = P × (1 − L).
-  Extra cash because of the gap = (P − min(P,A)·L) − P(1 − L) = L × G. Covered by the clause = min(G, C); uncovered = G − covered.
-  Show three outcomes side by side: buyer covers the whole gap, seller drops price to A, split down the middle; for each, price, buyer cash, seller price change.
-  Explain why the extra cash is L × G (the down payment is figured on the lower appraised value, so the buyer brings the gap plus the lost down payment difference). Not lending advice; lender rules (e.g. FHA/VA) differ.
-
-- [ ] **MLS remarks checker** (`/mls-remarks-checker/`) → Listing Writer (https://payhip.com/b/60TYy), free lite https://payhip.com/b/eT2ON. Agents.
-  Textarea for remarks; character limit input (default 1000, note that limits vary by MLS); live character count (with and without spaces), word count, over/under limit.
-  Flag phrases (case-insensitive, whole words) with a reason and a replacement idea, from the Listing Writer fair housing rules:
-  says who the buyer should be ("perfect for families", "ideal for young professionals", "great for retirees", "empty nesters", "bachelor pad", "perfect for a couple", "adult community" unless it is a legal 55+ community the agent confirms);
-  people or safety of the area ("safe neighborhood", "safe area", "exclusive", "family neighborhood", "quiet street of retirees", "integrated", "ethnic");
-  rating schools ("great schools", "top-rated district", "best schools"); religious landmarks as selling points ("walk to church", "near synagogue", "near mosque");
-  also flag openers "Welcome home", "Don't miss", "Look no further" as weak, not illegal.
-  Say clearly it is a first-pass word check, not legal review; "family room" as a room name and plain accessibility features are fine.
-
-- [ ] **Weekly training volume calculator** (`/training-volume-calculator/`) → Intake to Program (https://payhip.com/b/gVueK). Coaches.
-  Rows: exercise name, sets per session, sessions per week, primary muscle (select), optional secondary muscle (select).
-  Count: primary muscle gets every set, secondary gets half a set. Muscles: chest, back, shoulders, biceps, triceps, quads, hamstrings, glutes, calves, abs.
-  Output table: weekly sets per muscle, with a reference band of about 10–20 hard sets per week for most trained lifters (say it is a common guideline, not a rule; beginners often need less).
-  Flag muscles under 6 or over 25 sets, and any jump if the coach enters last block's numbers too (optional second column).
 
 - [ ] **Client adherence calculator** (`/client-adherence-calculator/`) → Check-in Analyzer (https://payhip.com/b/7gC9P). Coaches.
   Inputs for the period: sessions planned / done, days on nutrition target / days logged, step-goal days / days, check-ins due / sent.
