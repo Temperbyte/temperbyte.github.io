@@ -14,7 +14,7 @@
 </head>
 <body>
 <div class="wrap">
-<header class="site"><a class="brand" href="/"><i></i>Temperbyte</a><nav><a href="/escalation-clause-calculator/">Escalation</a><a href="/weight-trend-calculator/">Weight trend</a></nav></header>
+<header class="site"><a class="brand" href="/"><i></i>Temperbyte</a><nav><a href="/">Free tools</a><a href="https://payhip.com/Temperbyte">Store</a></nav></header>
 
 <h1>Weight trend calculator</h1>
 <p class="lede">Daily weigh-ins jump around with water, salt and sleep. Paste them here to see the weekly averages and the trend underneath.</p>
@@ -136,7 +136,7 @@ function calc(){
    ${dots}${line.length>1?`<polyline points="${line.join(' ')}" fill="none" stroke="var(--rust)" stroke-width="2.5" stroke-linejoin="round"/>`:''}</svg>
    <p class="note">Dots: daily weigh-ins. Line: 7-day rolling average.</p>`;
   out.innerHTML=`<p class="headline">${head}</p>${svg}
-  <table><thead><tr><th>Week</th><th class="n">Logged</th><th class="n">Average</th><th class="n">Daily swing</th><th class="n">Change</th></tr></thead><tbody>${rows}</tbody></table>
+  <div class="scroll"><table><thead><tr><th>Week</th><th class="n">Logged</th><th class="n">Average</th><th class="n">Daily swing</th><th class="n">Change</th></tr></thead><tbody>${rows}</tbody></table></div>
   ${notes.map(t=>`<p class="note">${t}</p>`).join('')}`;
 }
 document.addEventListener('input',calc);document.addEventListener('change',calc);

@@ -14,7 +14,7 @@
 </head>
 <body>
 <div class="wrap">
-<header class="site"><a class="brand" href="/"><i></i>Temperbyte</a><nav><a href="/escalation-clause-calculator/">Escalation</a><a href="/weight-trend-calculator/">Weight trend</a></nav></header>
+<header class="site"><a class="brand" href="/"><i></i>Temperbyte</a><nav><a href="/">Free tools</a><a href="https://payhip.com/Temperbyte">Store</a></nav></header>
 
 <h1>Escalation clause calculator</h1>
 <p class="lede">Enter every offer on the listing. You get each offer's final price after escalation and what the seller would actually net, side by side.</p>
@@ -137,7 +137,7 @@ function calc(){
   if(tie) notes.push('Two escalating offers share the highest cap, so there is no clear winner. The result depends on the clause wording and timing. Asking every buyer for their highest and best offer with no escalation clause removes the ambiguity.');
   if(offers.some(o=>o.credit>0)&&escs.length) notes.push('One or more offers ask for seller credits. Switch "compare against" above to see the other reading of the clause.');
   out.innerHTML=`<p class="headline">${head}</p>
-  <table><thead><tr><th>Offer</th><th class="n">Price</th><th class="n">After escalation</th><th class="n">Credits</th><th class="n">Seller net</th></tr></thead><tbody>${rows}</tbody></table>
+  <div class="scroll"><table><thead><tr><th>Offer</th><th class="n">Price</th><th class="n">After escalation</th><th class="n">Credits</th><th class="n">Seller net</th></tr></thead><tbody>${rows}</tbody></table></div>
   ${notes.map(t=>`<p class="note">${t}</p>`).join('')}
   <p class="note">Net = final price − credits − ${(comm*100).toFixed(2).replace(/\.?0+$/,'')}% commission − ${money(payoff)} payoff − ${money(other)} other costs.</p>`;
 }

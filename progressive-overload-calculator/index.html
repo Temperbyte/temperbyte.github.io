@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Progressive Overload Calculator: Next Session's Weight and Reps With Double Progression</title>
+<meta name="description" content="Free progressive overload calculator for coaches and lifters. Enter last session's sets and get next session's weight and rep targets using double progression, with load jumps kept within about 5% and a separate dumbbell rule.">
+<link rel="canonical" href="https://temperbyte.github.io/progressive-overload-calculator/">
+<meta property="og:title" content="Progressive Overload Calculator">
+<meta property="og:description" content="Last session's sets in, next session's weight and reps out.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<div class="wrap">
+<header class="site"><a class="brand" href="/"><i></i>Temperbyte</a><nav><a href="/">Free tools</a><a href="https://payhip.com/Temperbyte">Store</a></nav></header>
+
+<h1>Progressive overload calculator</h1>
+<p class="lede">Enter last session's working sets. You get next session's weight and rep targets, using double progression: add reps until every set hits the top of the range, then add weight.</p>
+
+<form class="tool" id="f" autocomplete="off" onsubmit="return false">
+  <fieldset>
+    <div class="grid">
+      <div><label for="eq">Equipment</label><select id="eq"><option value="bar">Barbell or machine</option><option value="db">Dumbbells or kettlebells</option></select></div>
+      <div><label for="unit">Unit</label><select id="unit"><option>kg</option><option>lb</option></select></div>
+      <div><label for="inc">Smallest weight step</label><input id="inc" inputmode="decimal" value="2.5"></div>
+      <div><label for="lo">Rep range: low</label><input id="lo" inputmode="numeric" value="8"></div>
+      <div><label for="hi">Rep range: high</label><input id="hi" inputmode="numeric" value="10"></div>
+      <div><label for="rpe">Target RPE (optional)</label><input id="rpe" inputmode="decimal" placeholder="none" value="8"></div>
+    </div>
+  </fieldset>
+  <fieldset>
+    <label for="sets">Last session's working sets, one per line: weight × reps, with RPE after @ if you track it (for example 60 x 10 @8)</label>
+    <textarea id="sets" spellcheck="false" style="min-height:120px">60 x 10 @8
+60 x 9 @8.5
+60 x 8 @9</textarea>
+  </fieldset>
+  <div class="result" id="out" aria-live="polite"></div>
+</form>
+
+<h2>How double progression works</h2>
+<p>Pick a rep range, for example 8 to 10. Keep the same weight and add reps, one set at a time, until every working set reaches the top of the range. Then add the smallest weight step and start again near the bottom of the range. It is simple, it works for beginners and experienced lifters, and it tells you exactly what to aim for each session.</p>
+<h3>The rules this calculator uses</h3>
+<ul>
+<li><strong>Not every set at the top yet:</strong> same weight. Aim for one more rep on each set that was below the top.</li>
+<li><strong>Every set at the top, at or below the target RPE:</strong> add weight. For barbells and machines the jump stays within about 5% of the current weight; if the smallest step is bigger than that, the calculator says so and suggests smaller plates or another rep first.</li>
+<li><strong>Dumbbells:</strong> they come in fixed sizes that are often more than 5% apart, so move up only when every set hit the top of the range, and expect the reps to drop toward the bottom of the range.</li>
+<li><strong>Effort too high:</strong> if the sets were more than one point above the target RPE, keep the weight and own the reps first.</li>
+<li><strong>Below the range:</strong> if most sets fell below the bottom of the range, keep the weight this time. If it happens again, drop about 5%.</li>
+</ul>
+<h3>Estimated one-rep max</h3>
+<p>The calculator also shows an estimated one-rep max (e1RM) from your best set with the Epley formula: weight × (1 + reps ÷ 30), for sets of 10 reps or fewer. Watching the e1RM week to week shows progress even when the weight on the bar has not changed yet.</p>
+<p class="note">General training math, not medical advice. Stop and get checked if a lift causes pain. Beginners should learn the movement with a coach before chasing numbers.</p>
+
+<div class="cta">
+  <p><strong>Writing the next block for your clients?</strong> The Program Progression skill for Claude reviews a whole training block from the log: per-lift progress, stalled and regressing lifts, adherence and fatigue signals, then writes the next 4-week block with starting loads and a message to the client.</p>
+  <a class="btn" href="https://payhip.com/b/gpAwi">See Program Progression</a>
+</div>
+
+<footer class="site">Made by Temperbyte. Free tools and Claude skills for real estate agents and fitness coaches. <a href="https://payhip.com/Temperbyte">Store</a> · <a href="https://github.com/Temperbyte/temperbyte-skills.">Free skills on GitHub</a> · <a href="https://www.pinterest.com/temperbyte/">Pinterest</a> · <a href="https://x.com/Temperbyte_AI">X</a> · <a href="https://www.tiktok.com/@temperbyte_skills">TikTok</a></footer>
+</div>
+
+<script>
+const $=s=>document.querySelector(s);
+const r2=x=>Math.round(x*100)/100;
+const fmt=x=>String(r2(x));
+let lastUnit=$('#unit').value;
+$('#unit').addEventListener('change',()=>{const u=$('#unit').value;if(u!==lastUnit){const inc=$('#inc');if(inc.value==='2.5'&&u==='lb')inc.value='5';else if(inc.value==='5'&&u==='kg')inc.value='2.5';lastUnit=u}});
+function parseSets(t){
+  return t.split(/\n+/).map(s=>s.trim()).filter(Boolean).map(s=>{
+    const m=s.replace(',', '.').match(/^([\d.]+)\s*(?:x|×|\*)\s*(\d+)(?:\s*@\s*([\d.]+))?/i);
+    if(!m)return {bad:s};
+    return {w:parseFloat(m[1]),r:parseInt(m[2],10),rpe:m[3]!==undefined?parseFloat(m[3]):null};
+  });
+}
+function calc(){
+  const out=$('#out'), u=$('#unit').value, eq=$('#eq').value;
+  const inc=parseFloat(String($('#inc').value).replace(',','.')), lo=parseInt($('#lo').value,10), hi=parseInt($('#hi').value,10);
+  const rpeT=$('#rpe').value.trim()===''?null:parseFloat($('#rpe').value.replace(',','.'));
+  const sets=parseSets($('#sets').value);
+  const bad=sets.filter(s=>s.bad);
+  if(!(inc>0)||!(lo>0)||!(hi>=lo)){out.innerHTML='<p class="note">Check the weight step and the rep range (low must not be above high).</p>';return}
+  if(bad.length){out.innerHTML=`<p class="note">Couldn't read: "${bad[0].bad.replace(/</g,'&lt;')}". Write each set as weight x reps, for example 60 x 10 or 60 x 10 @8.</p>`;return}
+  if(!sets.length){out.innerHTML='<p class="note">Enter at least one working set.</p>';return}
+  const weights=[...new Set(sets.map(s=>s.w))];
+  const w=Math.max(...weights);
+  const work=sets.filter(s=>s.w===w);
+  const allTop=work.every(s=>s.r>=hi);
+  const rpes=work.map(s=>s.rpe).filter(x=>x!==null);
+  const maxRpe=rpes.length?Math.max(...rpes):null;
+  const effortOk=rpeT===null||maxRpe===null||maxRpe<=rpeT;
+  const tooHard=rpeT!==null&&maxRpe!==null&&maxRpe>rpeT+1;
+  const below=work.filter(s=>s.r<lo).length;
+  // e1RM from best set of 1-10 reps (Epley)
+  const e=sets.filter(s=>s.r>=1&&s.r<=10).map(s=>({s,v:s.w*(1+s.r/30)})).sort((a,b)=>b.v-a.v)[0];
+  let head,plan=[],notes=[];
+  if(weights.length>1) notes.push(`Your sets used different weights; the plan is based on the heaviest, ${fmt(w)} ${u} (${work.length} set${work.length>1?'s':''}).`);
+  if(tooHard){
+    head=`Keep ${fmt(w)} ${u}`;
+    plan=work.map(s=>`${fmt(w)} ${u} × ${Math.min(s.r,hi)} at RPE ${rpeT} or lower`);
+    notes.push(`The hardest set was RPE ${maxRpe}, more than one point above your target of ${rpeT}. Repeat the same reps with better effort control before adding anything.`);
+  } else if(below>work.length/2){
+    head=`Keep ${fmt(w)} ${u}`;
+    plan=work.map(s=>`${fmt(w)} ${u} × ${s.r+1} (aim for ${lo} or more)`);
+    notes.push(`${below} of ${work.length} sets were below the bottom of the range (${lo}). Keep the weight this time; if it happens again next session, drop about 5% to ${fmt(Math.round(w*0.95/inc)*inc)} ${u}.`);
+  } else if(allTop&&effortOk){
+    let nw, msg, small=false;
+    if(eq==='db'){
+      nw=w+inc; msg=`Every set reached ${hi} reps, so move up one dumbbell size to ${fmt(nw)} ${u} (+${(inc/w*100).toFixed(1)}%). Dumbbell jumps are often bigger than 5%, so expect the reps to drop toward ${lo}.`;
+    } else {
+      if(inc>w*0.05+1e-9){
+        nw=w+inc; small=true; msg=`Every set reached ${hi} reps. The smallest step, ${fmt(inc)} ${u}, is ${(inc/w*100).toFixed(1)}% of ${fmt(w)} ${u}, more than about 5%. Use smaller plates if you have them, or add one more rep to each set first; then go to ${fmt(nw)} ${u}.`;
+      } else { nw=w+inc; msg=`Every set reached ${hi} reps${rpes.length?` at RPE ${maxRpe}`:''}, so add weight: ${fmt(nw)} ${u} (+${fmt(nw-w)} ${u}, ${((nw-w)/w*100).toFixed(1)}%, within about 5%).`; }
+    }
+    if(small){
+      head=`One more rep at ${fmt(w)} ${u}, then ${fmt(nw)} ${u}`;
+      plan=work.map(()=>`${fmt(w)} ${u} × ${hi+1}, or ${fmt(w+inc/2)} ${u} × ${hi} with smaller plates`);
+    } else {
+      head=`Go to ${fmt(nw)} ${u}`;
+      plan=work.map(()=>`${fmt(nw)} ${u} × ${lo} to ${hi}, start by aiming for ${lo}`);
+    }
+    notes.push(msg);
+  } else if(allTop&&!effortOk){
+    head=`Keep ${fmt(w)} ${u} one more session`;
+    plan=work.map(()=>`${fmt(w)} ${u} × ${hi} at RPE ${rpeT} or lower`);
+    notes.push(`Every set reached ${hi} reps, but the hardest was RPE ${maxRpe}, above your target of ${rpeT}. Hit ${hi} reps at RPE ${rpeT} or lower once more, then add weight.`);
+  } else {
+    head=`Keep ${fmt(w)} ${u}, add reps`;
+    plan=work.map(s=>s.r>=hi?`${fmt(w)} ${u} × ${hi} (keep)`:`${fmt(w)} ${u} × ${s.r+1} (one more than last time)`);
+    const need=work.filter(s=>s.r<hi).length;
+    notes.push(`${need} of ${work.length} sets are still below ${hi} reps. Add one rep to each of those; when every set hits ${hi}, add weight.`);
+  }
+  out.innerHTML=`<p class="headline">Next session: <b>${head}</b></p>
+  <div class="scroll"><table><thead><tr><th>Set</th><th>Last session</th><th>Next session target</th></tr></thead><tbody>
+  ${work.map((s,i)=>`<tr><td>${i+1}</td><td>${fmt(s.w)} ${u} × ${s.r}${s.rpe!==null?' @'+s.rpe:''}</td><td>${plan[i]}</td></tr>`).join('')}</tbody></table></div>
+  ${notes.map(t=>`<p class="note">${t}</p>`).join('')}
+  ${e?`<p class="note">Estimated one-rep max from your best set (${fmt(e.s.w)} ${u} × ${e.s.r}): <b>${fmt(Math.round(e.v*10)/10)} ${u}</b> (Epley). An estimate, not a max to test.</p>`:''}`;
+}
+document.addEventListener('input',calc);document.addEventListener('change',calc);
+calc();
+</script>
+</body>
+</html>

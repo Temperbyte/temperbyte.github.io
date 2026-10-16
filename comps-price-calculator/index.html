@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Comps Price Calculator: Price Per Square Foot and List Price Range From Comparable Sales</title>
+<meta name="description" content="Free comps calculator for listing agents. Enter comparable sales and get price per square foot for each comp, outliers flagged, the median, an indicated value and a suggested list price range for your CMA.">
+<link rel="canonical" href="https://temperbyte.github.io/comps-price-calculator/">
+<meta property="og:title" content="Comps Price Calculator">
+<meta property="og:description" content="Comparable sales in, median price per square foot and a list price range out.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<div class="wrap">
+<header class="site"><a class="brand" href="/"><i></i>Temperbyte</a><nav><a href="/">Free tools</a><a href="https://payhip.com/Temperbyte">Store</a></nav></header>
+
+<h1>Comps price calculator</h1>
+<p class="lede">Enter the comparable sales from your CMA. You get each comp's price per square foot, the outliers flagged, the median, and a list price range with the math shown.</p>
+
+<form class="tool" id="f" autocomplete="off" onsubmit="return false">
+  <fieldset>
+    <legend>The listing</legend>
+    <div class="grid">
+      <div><label for="sqft">Square feet</label><input id="sqft" inputmode="decimal" value="1850"></div>
+      <div><label for="place">Compared with the comps, it is</label>
+        <select id="place"><option value="mid">About the same</option><option value="up">Better (updated, larger lot...)</option><option value="down">Worse (dated, busy road...)</option></select></div>
+      <div><label for="target">Seller's target price ($, optional)</label><input id="target" inputmode="decimal" placeholder="none" value=""></div>
+    </div>
+  </fieldset>
+  <fieldset>
+    <legend>Sold comps</legend>
+    <div id="comps"></div>
+    <div class="actions"><button type="button" id="add">Add a comp</button></div>
+  </fieldset>
+  <div class="result" id="out" aria-live="polite"></div>
+</form>
+
+<h2>How the calculator prices from comps</h2>
+<ol>
+<li><strong>Price per square foot</strong> for each comp: sale price ÷ square feet.</li>
+<li><strong>Outliers out.</strong> With four or more comps, a comp whose price per square foot is more than 20% away from the median of the other comps is left out, and the calculator says which one and why.</li>
+<li><strong>Median, not average.</strong> The median of the comps that remain. One odd sale can move an average a lot and the median barely at all.</li>
+<li><strong>Indicated value:</strong> the listing's square feet × the median, and × the lowest and highest price per square foot, so you see the whole band.</li>
+<li><strong>Suggested range:</strong> about 4% wide. It is centered on the median value for a home that is about the same as the comps, and moved halfway toward the low or high end if it is clearly worse or better. It never goes outside the low–high band.</li>
+</ol>
+<h3>List-to-sale ratio and days on market</h3>
+<p>If you add each comp's original list price, the calculator shows the median list-to-sale ratio (sale price ÷ list price) and where offers are likely to land for your range. Days on market shows how fast the comps sold.</p>
+<h3>Why there are no dollar adjustments</h3>
+<p>Adding or subtracting a fixed amount for a garage or a bathroom looks precise but is mostly guesswork. Here you only say which way the listing differs from the comps. Put numbers on specific features only when you have local paired-sales data or an appraiser's view.</p>
+<h3>When the seller wants more</h3>
+<p>If you enter the seller's target, you see how far above the median value and above the top of the range it sits, in dollars and percent. That number is easier to discuss than an opinion.</p>
+<p class="note">This calculator does arithmetic on the comps you enter. It is not an appraisal and not legal or financial advice. Choose comps that are truly comparable: recent, nearby, similar size, age and type.</p>
+
+<div class="cta">
+  <p><strong>Pricing a listing this week?</strong> The Pricing Brief skill for Claude does this from pasted comps, plus confidence, the direction of each difference, actives and expireds as market signals, and seller talking points for the listing appointment.</p>
+  <a class="btn" href="https://payhip.com/b/7mleY">See Pricing Brief</a>
+</div>
+
+<footer class="site">Made by Temperbyte. Free tools and Claude skills for real estate agents and fitness coaches. <a href="https://payhip.com/Temperbyte">Store</a> · <a href="https://github.com/Temperbyte/temperbyte-skills.">Free skills on GitHub</a> · <a href="https://www.pinterest.com/temperbyte/">Pinterest</a> · <a href="https://x.com/Temperbyte_AI">X</a> · <a href="https://www.tiktok.com/@temperbyte_skills">TikTok</a></footer>
+</div>
+
+<script>
+const $=s=>document.querySelector(s);
+const money=n=>(n<0?'−$':'$')+Math.round(Math.abs(n)).toLocaleString('en-US');
+const ppsf=n=>'$'+n.toFixed(2);
+const pct=(x,d=1)=>(x>=0?'+':'−')+Math.abs(x).toFixed(d)+'%';
+const opt=v=>{const t=String(v).replace(/[$,\s]/g,'');if(!t)return null;const x=parseFloat(t);return isFinite(x)&&x>0?x:null};
+const median=a=>{const s=[...a].sort((x,y)=>x-y),m=s.length>>1;return s.length%2?s[m]:(s[m-1]+s[m])/2};
+const defaults=[
+  {label:'12 Oak St',price:441000,sqft:1780,list:449000,dom:12},
+  {label:'48 Elm Ave',price:468500,sqft:1920,list:475000,dom:9},
+  {label:'7 Birch Ct',price:452000,sqft:1840,list:459900,dom:21},
+  {label:'30 Pine Rd',price:476000,sqft:1990,list:479000,dom:6},
+  {label:'5 Cedar Ln',price:339000,sqft:1810,list:379000,dom:94}
+];
+let n=0;
+function addComp(c={label:'',price:'',sqft:'',list:'',dom:''}){
+  n++;
+  const d=document.createElement('div');d.className='offer comp';
+  d.innerHTML=`<div class="offer-head"><span>Comp ${n}</span><button type="button" class="link rm">Remove</button></div>
+  <div class="grid comp-grid">
+   <div><label>Address or note</label><input class="label" value="${c.label}"></div>
+   <div><label>Sale price ($)</label><input class="price" inputmode="decimal" value="${c.price}"></div>
+   <div><label>Square feet</label><input class="sqft" inputmode="decimal" value="${c.sqft}"></div>
+   <div><label>Original list price ($, optional)</label><input class="list" inputmode="decimal" placeholder="none" value="${c.list}"></div>
+   <div><label>Days on market (optional)</label><input class="dom" inputmode="decimal" placeholder="none" value="${c.dom}"></div>
+  </div>`;
+  d.querySelector('.rm').onclick=()=>{d.remove();calc()};
+  $('#comps').appendChild(d);
+}
+defaults.forEach(addComp);
+$('#add').onclick=()=>{addComp();calc()};
+document.addEventListener('input',calc);document.addEventListener('change',calc);
+
+function calc(){
+  const out=$('#out'), S=opt($('#sqft').value), place=$('#place').value, target=opt($('#target').value);
+  const comps=[...document.querySelectorAll('.comp')].map((d,i)=>({
+    i:i+1, label:d.querySelector('.label').value.trim()||`Comp ${i+1}`,
+    price:opt(d.querySelector('.price').value), sqft:opt(d.querySelector('.sqft').value),
+    list:opt(d.querySelector('.list').value), dom:(()=>{const t=d.querySelector('.dom').value.trim();if(t==='')return null;const x=parseFloat(t);return isFinite(x)&&x>=0?x:null})()
+  })).filter(c=>c.price&&c.sqft);
+  if(!S){out.innerHTML='<p class="note">Enter the listing\'s square feet.</p>';return}
+  if(!comps.length){out.innerHTML='<p class="note">Enter at least one comp with a sale price and square feet.</p>';return}
+  comps.forEach(c=>{c.p=c.price/c.sqft;c.out=false});
+  // outliers: more than 20% from the median of the other comps (needs 4+ comps)
+  if(comps.length>=4){
+    comps.forEach(c=>{const others=comps.filter(o=>o!==c).map(o=>o.p);const m=median(others);c.ref=m;c.dev=(c.p-m)/m;if(Math.abs(c.dev)>0.20)c.out=true});
+    if(comps.filter(c=>!c.out).length<3) comps.forEach(c=>c.out=false); // never leave fewer than 3
+  }
+  const used=comps.filter(c=>!c.out), ps=used.map(c=>c.p);
+  const med=median(ps), lo=Math.min(...ps), hi=Math.max(...ps);
+  const vMed=S*med, vLo=S*lo, vHi=S*hi;
+  let center=vMed, placeTxt='centered on the median value';
+  if(place==='up'){center=(vMed+vHi)/2;placeTxt='moved halfway from the median value toward the high end, because the listing is better than the comps'}
+  if(place==='down'){center=(vMed+vLo)/2;placeTxt='moved halfway from the median value toward the low end, because the listing is worse than the comps'}
+  let rLo=center*0.98, rHi=center*1.02;
+  const narrow=(vHi-vLo)/vMed<0.03;
+  if(narrow){center=vMed;rLo=vMed*0.98;rHi=vMed*1.02;placeTxt='centered on the median value, because the comps sit within 3% of each other'}
+  else if(vHi-vLo<=rHi-rLo){rLo=vLo;rHi=vHi;placeTxt='set to the whole low–high band, because the comps sit within about 4% of each other'}
+  else{ if(rLo<vLo){rHi+=vLo-rLo;rLo=vLo} if(rHi>vHi){rLo-=rHi-vHi;rHi=vHi} }
+  const round=x=>Math.round(x/1000)*1000;
+  rLo=round(rLo);rHi=round(rHi);
+  const ratios=used.filter(c=>c.list).map(c=>c.price/c.list), doms=used.filter(c=>c.dom!==null).map(c=>c.dom);
+  const rows=comps.map(c=>`<tr><td>${c.label}${c.out?' <span class="note">(left out)</span>':''}</td><td class="n">${money(c.price)}</td><td class="n">${c.sqft.toLocaleString('en-US')}</td><td class="n">${ppsf(c.p)}</td><td class="n">${c.list?(c.price/c.list*100).toFixed(1)+'%':'—'}</td><td class="n">${c.dom!==null?c.dom:'—'}</td></tr>`).join('');
+  let notes=[];
+  comps.filter(c=>c.out).forEach(c=>notes.push(`${c.label} is left out: ${ppsf(c.p)} per sq ft is ${pct(c.dev*100,0)} from the median of the other comps (${ppsf(c.ref)}). Check whether it was a distressed sale, a different condition or a data error.`));
+  if(comps.length<4) notes.push('With fewer than 4 comps, outliers are not checked. Add more comps for a firmer range.');
+  if(used.length<3) notes.push('<strong>Low confidence:</strong> fewer than 3 usable comps. Treat the range as a rough first look.');
+  notes.push(`Range math: ${S.toLocaleString('en-US')} sq ft × ${ppsf(med)} median = ${money(vMed)}. The range is ${placeTxt}, inside the ${money(vLo)} to ${money(vHi)} band, and rounded to the nearest $1,000.`);
+  let extra='';
+  if(ratios.length){const r=median(ratios);extra+=`<p class="note">Median list-to-sale ratio: <b>${(r*100).toFixed(1)}%</b> (${ratios.length} comps). If the listing sells like its comps, a list price of ${money(rLo)} to ${money(rHi)} points to offers around ${money(round(rLo*r))} to ${money(round(rHi*r))}.</p>`}
+  if(doms.length) extra+=`<p class="note">Median days on market of the comps used: <b>${median(doms)}</b>.</p>`;
+  if(target){
+    const aMed=(target-vMed)/vMed*100, aTop=(target-rHi)/rHi*100;
+    extra+= target>rHi
+      ? `<p class="note"><strong>Seller's target ${money(target)}</strong> is ${money(target-vMed)} (${pct(aMed)}) above the median value and ${money(target-rHi)} (${pct(aTop)}) above the top of the range.</p>`
+      : target<rLo ? `<p class="note"><strong>Seller's target ${money(target)}</strong> is below the range, ${money(rLo-target)} under its low end.</p>`
+      : `<p class="note"><strong>Seller's target ${money(target)}</strong> is inside the range.</p>`;
+  }
+  out.innerHTML=`<p class="headline">Suggested list range: <b>${money(rLo)} to ${money(rHi)}</b></p>
+  <p>Median <b>${ppsf(med)}</b> per sq ft from ${used.length} comp${used.length>1?'s':''} (low ${ppsf(lo)}, high ${ppsf(hi)}). Indicated value ${money(vMed)}, band ${money(vLo)} to ${money(vHi)}.</p>
+  <div class="scroll"><table><thead><tr><th>Comp</th><th class="n">Sale price</th><th class="n">Sq ft</th><th class="n">$/sq ft</th><th class="n">Sale/list</th><th class="n">DOM</th></tr></thead><tbody>${rows}</tbody></table></div>
+  ${extra}${notes.map(t=>`<p class="note">${t}</p>`).join('')}`;
+}
+calc();
+</script>
+</body>
+</html>

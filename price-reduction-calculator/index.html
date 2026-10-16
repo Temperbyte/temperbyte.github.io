@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Price Reduction Calculator: When to Lower a Listing Price and Which Search Bracket to Hit</title>
+<meta name="description" content="Free price reduction calculator for listing agents. Check days on market, showings and feedback for a reduce-or-hold signal, then see which buyer search price brackets a new price would reach and what the reduction costs the seller.">
+<link rel="canonical" href="https://temperbyte.github.io/price-reduction-calculator/">
+<meta property="og:title" content="Price Reduction Calculator">
+<meta property="og:description" content="Is it time to lower the price, and which search bracket does the new price land in?">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<div class="wrap">
+<header class="site"><a class="brand" href="/"><i></i>Temperbyte</a><nav><a href="/">Free tools</a><a href="https://payhip.com/Temperbyte">Store</a></nav></header>
+
+<h1>Price reduction calculator</h1>
+<p class="lede">Two questions in one place: does the listing's activity say it is time to talk about price, and if the price changes, which buyer searches does the new price reach?</p>
+
+<form class="tool" id="f" autocomplete="off" onsubmit="return false">
+  <fieldset>
+    <legend>Activity so far</legend>
+    <div class="grid">
+      <div><label for="dom">Days on market</label><input id="dom" inputmode="decimal" value="38"></div>
+      <div><label for="mdom">Typical days on market in the area (optional)</label><input id="mdom" inputmode="decimal" placeholder="unknown" value="21"></div>
+      <div><label for="offers">Offers so far</label><input id="offers" inputmode="decimal" value="0"></div>
+      <div><label for="s3">Showings 3 weeks ago</label><input id="s3" inputmode="decimal" placeholder="unknown" value="7"></div>
+      <div><label for="s2">Showings 2 weeks ago</label><input id="s2" inputmode="decimal" placeholder="unknown" value="4"></div>
+      <div><label for="s1">Showings last week</label><input id="s1" inputmode="decimal" placeholder="unknown" value="2"></div>
+      <div><label for="pfb">Feedback that mentions price or value</label><input id="pfb" inputmode="decimal" value="3"></div>
+      <div><label for="ofb">Same non-price objection repeating?</label><select id="ofb"><option value="no">No</option><option value="yes">Yes (photos, smell, repair, access...)</option></select></div>
+    </div>
+  </fieldset>
+  <fieldset>
+    <legend>Price</legend>
+    <div class="grid">
+      <div><label for="cur">Current list price ($)</label><input id="cur" inputmode="decimal" value="512000"></div>
+      <div><label for="newp">New price to test ($, optional)</label><input id="newp" inputmode="decimal" placeholder="none" value=""></div>
+      <div><label for="step">Buyers' search filters move in steps of</label><select id="step"><option value="10000">$10,000</option><option value="25000" selected>$25,000</option><option value="50000">$50,000</option><option value="100000">$100,000</option></select></div>
+      <div><label for="comm">Commission (%)</label><input id="comm" inputmode="decimal" value="5"></div>
+    </div>
+  </fieldset>
+  <div class="result" id="out" aria-live="polite"></div>
+</form>
+
+<h2>When is it time to talk about price?</h2>
+<p>The calculator reads the same signals most listing agents watch, and gives one of three answers:</p>
+<ul>
+<li><strong>Stay the course:</strong> activity is steady or rising, days on market are within the normal range for the area (or under about 21 days when the area's number is unknown), and no objection keeps repeating.</li>
+<li><strong>Fix something other than price:</strong> the same non-price objection keeps coming up, such as photos, a smell, a repair or hard showing access. Fix that one thing first.</li>
+<li><strong>Discuss price:</strong> price or value comes up in two or more pieces of feedback, or showings have fallen two weeks in a row with no offers, or days on market are well past the area's typical number (more than one and a half times).</li>
+</ul>
+<p>"Discuss price" means it is time for an updated comparative market analysis and an honest meeting with the seller. The calculator never picks the new price for you.</p>
+<h2>Why search brackets matter</h2>
+<p>Most buyers search with a maximum price, usually a round number such as $500,000. A home listed at $512,000 is invisible to everyone searching "up to $500,000", even though it may sell for less than that. Pricing just under a bracket line (for example $499,900) puts the listing in front of a whole new group of buyers, while the buyers searching up to $525,000 or $550,000 still see it.</p>
+<p>The calculator shows the bracket lines below the current price, what it costs to reach each one, and how many brackets a new price would add. Check the steps your local portals actually use: many move in $10,000 steps at lower prices and $25,000 or $50,000 steps higher up.</p>
+<p class="note">This is a decision aid, not a pricing opinion or legal advice. A price change is the seller's decision. Base it on fresh comps, not only on activity.</p>
+
+<div class="cta">
+  <p><strong>Writing seller updates every week?</strong> The Seller Update skill for Claude turns showing feedback and listing stats into an honest weekly update with the real numbers, the pattern in the feedback, a stay, adjust or discuss-price call, and a ready-to-send message.</p>
+  <a class="btn" href="https://payhip.com/b/UXnhj">See Seller Update</a>
+  <p class="note" style="margin-top:12px">Need the comps side? Try the free <a href="/comps-price-calculator/">comps price calculator</a>.</p>
+</div>
+
+<footer class="site">Made by Temperbyte. Free tools and Claude skills for real estate agents and fitness coaches. <a href="https://payhip.com/Temperbyte">Store</a> · <a href="https://github.com/Temperbyte/temperbyte-skills.">Free skills on GitHub</a> · <a href="https://www.pinterest.com/temperbyte/">Pinterest</a> · <a href="https://x.com/Temperbyte_AI">X</a> · <a href="https://www.tiktok.com/@temperbyte_skills">TikTok</a></footer>
+</div>
+
+<script>
+const $=s=>document.querySelector(s);
+const money=n=>(n<0?'−$':'$')+Math.round(Math.abs(n)).toLocaleString('en-US');
+const val=id=>{const t=String($(id).value).replace(/[$,\s%]/g,'');if(t==='')return null;const x=parseFloat(t);return isFinite(x)&&x>=0?x:null};
+
+function verdict(){
+  const dom=val('#dom'), mdom=val('#mdom'), offers=val('#offers')||0, pfb=val('#pfb')||0, ofb=$('#ofb').value==='yes';
+  const s=[val('#s3'),val('#s2'),val('#s1')];
+  const reasons=[];
+  const known=s.filter(x=>x!==null);
+  const falling2=s.every(x=>x!==null)&&s[0]>s[1]&&s[1]>s[2];
+  const falling1=s[1]!==null&&s[2]!==null&&s[2]<s[1];
+  const domFar=dom!==null&&(mdom?dom>1.5*mdom:false);
+  const domNormal=dom!==null&&(mdom?dom<=mdom:dom<=21);
+  if(pfb>=2) reasons.push(`${pfb} pieces of feedback mention price or value`);
+  if(falling2&&offers===0) reasons.push(`showings fell two weeks in a row (${s.join(' → ')}) with no offers`);
+  if(domFar) reasons.push(`${dom} days on market is more than 1.5 × the area's typical ${mdom}`);
+  if(reasons.length) return {k:'DISCUSS PRICE',t:'Time to discuss price',why:reasons,next:'Prepare an updated comparative market analysis and meet the seller with these numbers. Don\'t name a new price before the fresh comps are done.'};
+  if(ofb) return {k:'ADJUST',t:'Fix something other than price first',why:['the same non-price objection keeps repeating'],next:'Name the one change most likely to help (photos, staging, a repair, showing access or the description) and set a date to look at price again if activity doesn\'t pick up.'};
+  const why=[];
+  if(dom!==null) why.push(domNormal?`${dom} days on market is within the normal range${mdom?` (area ${mdom})`:' (under about 21 days)'}`:`${dom} days on market is above ${mdom?`the area's typical ${mdom}`:'about 21 days'} but not far past it`);
+  if(known.length>=2) why.push(falling1?`showings dipped last week (${s.filter(x=>x!==null).join(' → ')}), not yet two weeks in a row`:`showings are steady or rising (${s.filter(x=>x!==null).join(' → ')})`);
+  if(pfb===1) why.push('one piece of feedback mentions price; watch for a second');
+  return {k:'STAY',t:'Stay the course',why:why.length?why:['no warning signs in the numbers entered'],next:`Revisit price if ${mdom?`days on market pass ${Math.round(1.5*mdom)}`:'days on market pass about 30'}, price comes up in feedback again, or showings fall two weeks in a row.`};
+}
+
+function brackets(cur,step){
+  // bracket lines (round max-price filters) below the current price, nearest first
+  const lines=[];let b=Math.floor((cur-1)/step)*step;
+  while(b>0&&lines.length<4){lines.push(b);b-=step}
+  return lines;
+}
+
+function calc(){
+  const out=$('#out'), cur=val('#cur'), newp=val('#newp'), step=+$('#step').value, comm=(val('#comm')||0)/100;
+  const v=verdict();
+  let html=`<p class="headline">${v.t}: <b>${v.k==='DISCUSS PRICE'?'yes':v.k==='ADJUST'?'not price yet':'hold'}</b></p>
+  <p>${v.why.map(w=>w.charAt(0).toUpperCase()+w.slice(1)).join('. ')}.</p><p class="note">${v.next}</p>`;
+  if(cur){
+    const lines=brackets(cur,step);
+    const rows=lines.map(b=>{const p=b-100, cut=cur-p;return `<tr><td>Up to ${money(b)}</td><td class="n">${money(p)}</td><td class="n">${money(cut)}</td><td class="n">${(cut/cur*100).toFixed(1)}%</td><td class="n">${money(cut*(1-comm))}</td></tr>`}).join('');
+    html+=`<h3>Search brackets below ${money(cur)}</h3>
+    <p class="note">Right now the listing shows up for buyers whose maximum is ${money(Math.ceil(cur/step)*step)} or more. Each row is a price just under a bracket line.</p>
+    <div class="scroll"><table><thead><tr><th>Buyers searching</th><th class="n">Price to reach them</th><th class="n">Reduction</th><th class="n">%</th><th class="n">Seller's net change</th></tr></thead><tbody>${rows}</tbody></table></div>
+    <p class="note">Seller's net change = the reduction minus the commission that would have been paid on it (${(comm*100).toFixed(2).replace(/\.?0+$/,'')}%).</p>`;
+    if(newp){
+      if(newp>=cur) html+=`<p class="note">The new price to test is not below the current price.</p>`;
+      else{
+        const reach=Math.ceil(newp/step)*step, gained=(Math.ceil(cur/step)-Math.ceil(newp/step));
+        const cut=cur-newp;
+        html+=`<p><strong>Testing ${money(newp)}:</strong> a ${money(cut)} reduction (${(cut/cur*100).toFixed(1)}%). It shows up for buyers searching up to ${money(reach)} and above, ${gained>0?`<b>${gained} more bracket${gained>1?'s':''}</b> than now`:'<b>no new bracket</b>: the same buyers who see it now'}.${gained===0?` To reach the next bracket, go to ${money(Math.floor((cur-1)/step)*step-100)}.`:''}</p>`;
+        const over=newp%step; if(gained>0&&over>0&&over<=step*0.05) html+=`<p class="note">${money(newp)} sits just over a bracket line. ${money(newp-over-100)} would reach one more bracket.</p>`;
+      }
+    }
+  }
+  out.innerHTML=html;
+}
+document.addEventListener('input',calc);document.addEventListener('change',calc);
+calc();
+</script>
+</body>
+</html>
