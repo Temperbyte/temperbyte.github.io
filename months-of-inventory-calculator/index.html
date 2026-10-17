@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Months of Inventory Calculator: Absorption Rate and Buyer's or Seller's Market</title>
+<meta name="description" content="Free months of inventory calculator for real estate agents. Enter active listings and recent closed sales to get months of supply, the absorption rate and whether the market leans toward buyers or sellers. Compare two areas or price bands.">
+<link rel="canonical" href="https://temperbyte.github.io/months-of-inventory-calculator/">
+<meta property="og:title" content="Months of Inventory Calculator">
+<meta property="og:description" content="Active listings and recent sales in, months of supply and the market read out.">
+<meta property="og:image" content="https://temperbyte.github.io/assets/social/18-months-of-inventory.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<div class="wrap">
+<header class="site"><a class="brand" href="/"><i></i>Temperbyte</a><nav><a href="/">Free tools</a><a href="https://payhip.com/Temperbyte">Store</a></nav></header>
+
+<h1>Months of inventory calculator</h1>
+<p class="lede">How long would today's listings take to sell at the recent pace? Enter active listings and recent closed sales for an area or price band, and compare two side by side.</p>
+
+<form class="tool" id="f" autocomplete="off" onsubmit="return false">
+  <fieldset>
+    <legend>Market A</legend>
+    <div class="grid">
+      <div><label for="na">Name (optional)</label><input id="na" value="All price bands"></div>
+      <div><label for="aa">Active listings now</label><input id="aa" inputmode="numeric" value="84"></div>
+      <div><label for="sa">Closed sales in the period</label><input id="sa" inputmode="numeric" value="126"></div>
+      <div><label for="ma">Period (months)</label><input id="ma" inputmode="decimal" value="6"></div>
+    </div>
+  </fieldset>
+  <fieldset>
+    <legend>Market B (optional, for example one price band)</legend>
+    <div class="grid">
+      <div><label for="nb">Name (optional)</label><input id="nb" value="$600k+"></div>
+      <div><label for="ab">Active listings now</label><input id="ab" inputmode="numeric" value="31"></div>
+      <div><label for="sb">Closed sales in the period</label><input id="sb" inputmode="numeric" value="24"></div>
+      <div><label for="mb">Period (months)</label><input id="mb" inputmode="decimal" value="6"></div>
+    </div>
+  </fieldset>
+  <div class="result" id="out" aria-live="polite"></div>
+</form>
+
+<h2>How months of inventory is calculated</h2>
+<ul>
+<li><strong>Monthly sales pace</strong> = closed sales in the period ÷ months in the period.</li>
+<li><strong>Months of inventory</strong> (months of supply) = active listings ÷ monthly sales pace. It answers: if no new listings came on, how many months until everything sold?</li>
+<li><strong>Absorption rate</strong> = monthly sales pace ÷ active listings, as a percent. The share of the listings that sells in a typical month.</li>
+</ul>
+<h3>Reading the number</h3>
+<p>A common rule of thumb: under about 4 months is often called a seller's market, about 4 to 6 months balanced, and over 6 months a buyer's market. These lines are conventions, not laws. They vary by area, season and price band, and luxury homes often have more months of supply than entry-level homes in the same town. Compare against the same area's own history when you can.</p>
+<h3>Why compare price bands</h3>
+<p>A town can be a seller's market under $400,000 and a buyer's market over $800,000 at the same time. Running the numbers for the listing's own price band gives the seller a much more honest picture than the area as a whole.</p>
+<p class="note">Arithmetic on the numbers you enter, not a market forecast. Use closed sales from your MLS for the same area and property type as the active count, and a period of at least 3 to 6 months to smooth out seasonal swings.</p>
+
+<div class="cta">
+  <p><strong>Pricing a listing this week?</strong> The Pricing Brief skill for Claude turns pasted comps into the price per square foot math, outliers explained, a suggested list range with confidence, market signals from actives and expireds, and seller talking points.</p>
+  <a class="btn" href="https://payhip.com/b/7mleY">See Pricing Brief</a>
+  <p class="note" style="margin-top:12px">Or try the free <a href="/comps-price-calculator/">comps price calculator</a>.</p>
+</div>
+
+<figure class="share"><img src="../assets/social/18-months-of-inventory.png" alt="Months of inventory calculator: months of supply and the market read" width="200" height="300"><figcaption class="note">Useful? Save it to Pinterest or share the link with a colleague.</figcaption></figure>
+
+<footer class="site">Made by Temperbyte. Free tools and Claude skills for real estate agents and fitness coaches. <a href="https://payhip.com/Temperbyte">Store</a> · <a href="https://github.com/Temperbyte/temperbyte-skills.">Free skills on GitHub</a> · <a href="https://www.pinterest.com/temperbyte/">Pinterest</a> · <a href="https://x.com/Temperbyte_AI">X</a> · <a href="https://www.tiktok.com/@temperbyte_skills">TikTok</a></footer>
+</div>
+
+<script>
+const $=s=>document.querySelector(s);
+const num=id=>{const t=String($(id).value).replace(/[,\s]/g,'');if(t==='')return null;const x=parseFloat(t);return isFinite(x)&&x>=0?x:NaN};
+const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;');
+function read(k,label){
+  const A=num('#a'+k),S=num('#s'+k),M=num('#m'+k),name=$('#n'+k).value.trim()||label;
+  if(A===null&&S===null) return null;
+  if([A,S,M].some(v=>v===null||isNaN(v))||M===0) return {name,err:'Fill in active listings, closed sales and a period above 0.'};
+  if(S===0) return {name,A,S,M,pace:0,moi:Infinity,abs:0};
+  const pace=S/M; return {name,A,S,M,pace,moi:A/pace,abs:A?pace/A*100:Infinity};
+}
+const label=m=>m===Infinity?"No sales in the period: can't measure":m<4?"Seller's market":m<=6?'Balanced':"Buyer's market";
+function calc(){
+  const out=$('#out'), list=[read('a','Market A'),read('b','Market B')].filter(Boolean);
+  if(!list.length){out.innerHTML='<p class="note">Enter active listings and closed sales.</p>';return}
+  const ok=list.filter(r=>!r.err), errs=list.filter(r=>r.err);
+  if(!ok.length){out.innerHTML=`<p class="note">${errs[0].err}</p>`;return}
+  const f=(x,d=1)=>x===Infinity?'—':x.toFixed(d);
+  const a=ok[0];
+  const head=a.moi===Infinity?`${esc(a.name)}: <b>no closed sales</b> in the period`:`${esc(a.name)}: <b>${f(a.moi)} months</b> of inventory, ${label(a.moi).toLowerCase()}`;
+  const rows=ok.map(r=>`<tr><td>${esc(r.name)}</td><td class="n">${r.A}</td><td class="n">${f(r.pace)}</td><td class="n">${f(r.moi)}</td><td class="n">${r.abs===Infinity?'—':f(r.abs,0)+'%'}</td><td>${label(r.moi)}</td></tr>`).join('');
+  const notes=[];
+  ok.forEach(r=>{if(r.moi!==Infinity) notes.push(`${esc(r.name)}: ${r.S} sales ÷ ${r.M} months = ${f(r.pace)} a month. ${r.A} active ÷ ${f(r.pace)} = ${f(r.moi)} months.`)});
+  if(ok.length===2&&ok.every(r=>r.moi!==Infinity)){const [x,y]=ok;notes.push(`${esc(y.name)} has ${f(Math.abs(y.moi-x.moi))} ${y.moi>x.moi?'more':'fewer'} months of supply than ${esc(x.name)}${label(x.moi)!==label(y.moi)?`, so the two lean different ways (${label(x.moi).toLowerCase()} vs. ${label(y.moi).toLowerCase()})`:''}.`)}
+  if(ok.some(r=>r.M<3)) notes.push('A period under 3 months can swing a lot with the season. 6 or 12 months gives a steadier pace.');
+  errs.forEach(r=>notes.push(`${esc(r.name)}: ${r.err}`));
+  out.innerHTML=`<p class="headline">${head}</p>
+  <div class="scroll"><table><thead><tr><th>Market</th><th class="n">Active</th><th class="n">Sales/month</th><th class="n">Months</th><th class="n">Absorption</th><th>Read</th></tr></thead><tbody>${rows}</tbody></table></div>
+  ${notes.map(t=>`<p class="note">${t}</p>`).join('')}`;
+}
+document.addEventListener('input',calc);calc();
+</script>
+</body>
+</html>

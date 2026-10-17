@@ -18,17 +18,12 @@ nothing sent anywhere. Never invent statistics or legal rules; when a convention
 - [x] 2026-10-16 MLS remarks checker → Listing Writer (https://payhip.com/b/60TYy)
 - [x] 2026-10-16 Training volume calculator → Intake to Program (https://payhip.com/b/gVueK)
 
+- [x] 2026-10-17 Client adherence calculator → Check-in Analyzer (https://payhip.com/b/7gC9P)
+- [x] 2026-10-17 Months of inventory calculator → Pricing Brief (https://payhip.com/b/7mleY)
+
 ## Next (in this order)
 
-- [ ] **Client adherence calculator** (`/client-adherence-calculator/`) → Check-in Analyzer (https://payhip.com/b/7gC9P). Coaches.
-  Inputs for the period: sessions planned / done, days on nutrition target / days logged, step-goal days / days, check-ins due / sent.
-  Output: each as a percent and an overall average of the areas filled in. Rule from our skills: under about 75% → don't change targets or add volume; find out what got in the way. 75% or more and the trend is off for two weeks → one small change.
-  Never shame wording; add the note that skipping meals to compensate or exercising far beyond the plan is a reason to talk, not to adjust.
-
-- [ ] **Months of inventory calculator** (`/months-of-inventory-calculator/`) → Pricing Brief (https://payhip.com/b/7mleY). Agents.
-  Inputs: active listings now, closed sales in the last N months, N (default 6). Months of inventory = active ÷ (sales ÷ N). Absorption rate = (sales ÷ N) ÷ active, as % per month.
-  Market read: under about 4 months often called a seller's market, about 4–6 balanced, over 6 a buyer's market; say plainly that thresholds vary by area and price band.
-  Optional: the same for a price band to compare.
+- [ ] (empty: research the next ideas for the same two audiences, each linked to an existing paid skill)
 
 ## Rules for the weekly build
 

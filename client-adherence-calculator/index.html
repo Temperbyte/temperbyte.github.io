@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Client Adherence Calculator: Training, Nutrition and Check-in Compliance for Coaches</title>
+<meta name="description" content="Free client adherence calculator for coaches. Enter planned and completed sessions, nutrition days, step goals and check-ins, and see each as a percent, the overall adherence and whether to hold or change the plan.">
+<link rel="canonical" href="https://temperbyte.github.io/client-adherence-calculator/">
+<meta property="og:title" content="Client Adherence Calculator">
+<meta property="og:description" content="Planned vs. done in, adherence and a hold-or-change call out.">
+<meta property="og:image" content="https://temperbyte.github.io/assets/social/17-client-adherence.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/site.css">
+<style>.meter{height:8px;background:var(--rule);position:relative;min-width:90px}.meter i{position:absolute;left:0;top:0;bottom:0;background:var(--ink)}.meter i.low{background:var(--rust)}.meter b{position:absolute;left:75%;top:-3px;bottom:-3px;width:1px;background:var(--muted)}</style>
+</head>
+<body>
+<div class="wrap">
+<header class="site"><a class="brand" href="/"><i></i>Temperbyte</a><nav><a href="/">Free tools</a><a href="https://payhip.com/Temperbyte">Store</a></nav></header>
+
+<h1>Client adherence calculator</h1>
+<p class="lede">Before you change a client's plan, check how much of the current plan actually happened. Enter what was planned and what was done for the period.</p>
+
+<form class="tool" id="f" autocomplete="off" onsubmit="return false">
+  <fieldset>
+    <legend>For the period (for example the last 4 weeks). Leave an area empty if you don't track it.</legend>
+    <div class="grid">
+      <div><label for="sp">Sessions planned</label><input id="sp" inputmode="numeric" value="16"></div>
+      <div><label for="sd">Sessions done</label><input id="sd" inputmode="numeric" value="13"></div>
+      <div><label for="np">Days logged (nutrition)</label><input id="np" inputmode="numeric" value="28"></div>
+      <div><label for="nd">Days on target</label><input id="nd" inputmode="numeric" value="22"></div>
+      <div><label for="tp">Days in the period (steps)</label><input id="tp" inputmode="numeric" value="28"></div>
+      <div><label for="td">Days the step goal was hit</label><input id="td" inputmode="numeric" value="18"></div>
+      <div><label for="cp">Check-ins due</label><input id="cp" inputmode="numeric" value="4"></div>
+      <div><label for="cd">Check-ins sent</label><input id="cd" inputmode="numeric" value="4"></div>
+      <div><label for="trend">Has the trend been off target for 2+ weeks?</label><select id="trend"><option value="no">No</option><option value="yes" selected>Yes</option></select></div>
+    </div>
+  </fieldset>
+  <div class="result" id="out" aria-live="polite"></div>
+</form>
+
+<h2>Why adherence comes first</h2>
+<p>When a client isn't progressing, the first question is not "what should change?" but "how much of the plan happened?". A plan followed half the time hasn't been tested yet. Changing targets or adding volume on top of low adherence usually makes the plan harder to follow, not more effective.</p>
+<h3>The rule this calculator uses</h3>
+<ul>
+<li><strong>Under about 75% overall:</strong> hold the plan. Don't add volume or change targets. Talk with the client about what got in the way (schedule, time, motivation, stress) and make the plan fit the week they actually have, for example fewer sessions or simpler meals.</li>
+<li><strong>75% or more, and the trend has been off for two weeks or more:</strong> change one thing, by a small amount. Not three things at once, so you can tell what worked.</li>
+<li><strong>75% or more, trend on track:</strong> keep going.</li>
+</ul>
+<p>Each area under 75% is flagged on its own too, because a client can hit every meal target and still miss half the sessions.</p>
+<h3>How it's calculated</h3>
+<p>Each area is done ÷ planned × 100. The overall number is the plain average of the areas you filled in, so leave out what you don't track.</p>
+<p class="note">A coaching aid, not medical advice. Dizziness, fainting, guilt around food, skipping meals to make up for eating, or exercising far beyond the plan are reasons to talk with the client and involve a professional, not to adjust a target.</p>
+
+<div class="cta">
+  <p><strong>Reviewing check-ins every week?</strong> The Check-in Analyzer skill for Claude counts adherence from a pasted check-in, does the weight trend math, makes the hold, adjust or review call with the reason, flags red flags, and writes a ready-to-send reply in your voice.</p>
+  <a class="btn" href="https://payhip.com/b/7gC9P">See Check-in Analyzer</a>
+  <p class="note" style="margin-top:12px">Or try the <a href="https://payhip.com/b/MOo7j">free lite version</a>, or the free <a href="/weight-trend-calculator/">weight trend calculator</a>.</p>
+</div>
+
+<figure class="share"><img src="../assets/social/17-client-adherence.png" alt="Client adherence calculator: planned vs. done and a hold-or-change call" width="200" height="300"><figcaption class="note">Useful? Save it to Pinterest or share the link with a colleague.</figcaption></figure>
+
+<footer class="site">Made by Temperbyte. Free tools and Claude skills for real estate agents and fitness coaches. <a href="https://payhip.com/Temperbyte">Store</a> · <a href="https://github.com/Temperbyte/temperbyte-skills.">Free skills on GitHub</a> · <a href="https://www.pinterest.com/temperbyte/">Pinterest</a> · <a href="https://x.com/Temperbyte_AI">X</a> · <a href="https://www.tiktok.com/@temperbyte_skills">TikTok</a></footer>
+</div>
+
+<script>
+const $=s=>document.querySelector(s);
+const val=id=>{const t=String($(id).value).trim();if(t==='')return null;const x=parseFloat(t.replace(',','.'));return isFinite(x)&&x>=0?x:NaN};
+const AREAS=[['Training sessions','sp','sd'],['Nutrition','np','nd'],['Step goal','tp','td'],['Check-ins','cp','cd']];
+function calc(){
+  const out=$('#out'), rows=[], bad=[];
+  for(const [name,p,d] of AREAS){
+    const P=val('#'+p), D=val('#'+d);
+    if(P===null&&D===null) continue;
+    if(P===null||D===null||isNaN(P)||isNaN(D)||P===0){bad.push(name);continue}
+    rows.push({name,P,D,pct:Math.min(D/P,1)*100,over:D>P});
+  }
+  if(bad.length&&!rows.length){out.innerHTML=`<p class="note">Fill in both numbers for ${bad.join(', ')} (planned must be more than 0).</p>`;return}
+  if(!rows.length){out.innerHTML='<p class="note">Fill in at least one area.</p>';return}
+  const overall=rows.reduce((a,r)=>a+r.pct,0)/rows.length;
+  const trendOff=$('#trend').value==='yes', low=rows.filter(r=>r.pct<75);
+  let head,next;
+  if(overall<75){head=`Hold the plan: <b>${overall.toFixed(0)}% adherence</b>`;next="Don't add volume or change targets yet. Find out what got in the way and make the plan fit the week the client actually has."}
+  else if(trendOff){head=`One small change: <b>${overall.toFixed(0)}% adherence</b>`;next='The plan has really been tested and the trend is still off. Change one thing by a small amount, then give it two weeks.'}
+  else{head=`Keep going: <b>${overall.toFixed(0)}% adherence</b>`;next='The plan is being followed and the trend is on track. No change needed.'}
+  const tr=rows.map(r=>`<tr><td>${r.name}</td><td class="n">${r.D} of ${r.P}</td><td class="n">${r.pct.toFixed(0)}%</td><td><div class="meter"><i class="${r.pct<75?'low':''}" style="width:${r.pct.toFixed(1)}%"></i><b></b></div></td></tr>`).join('');
+  const notes=[];
+  if(low.length) notes.push(`Below 75%: ${low.map(r=>r.name.toLowerCase()).join(', ')}. Ask about ${low.length>1?'these':'this'} first; it is the most likely reason the plan isn't working.`);
+  if(rows.some(r=>r.over)) notes.push('Done is higher than planned in at least one area; it is counted as 100%. Doing far more than planned can also be worth a conversation.');
+  if(bad.length) notes.push(`Left out because a number is missing or planned is 0: ${bad.join(', ')}.`);
+  if(rows.length<2) notes.push('With only one area, the overall number is that area.');
+  out.innerHTML=`<p class="headline">${head}</p><p>${next}</p>
+  <div class="scroll"><table><thead><tr><th>Area</th><th class="n">Done</th><th class="n">%</th><th>75% line</th></tr></thead><tbody>${tr}</tbody></table></div>
+  ${notes.map(t=>`<p class="note">${t}</p>`).join('')}
+  <p class="note">Overall = average of ${rows.length} area${rows.length>1?'s':''}: (${rows.map(r=>r.pct.toFixed(1)+'%').join(' + ')}) ÷ ${rows.length} = ${overall.toFixed(1)}%.</p>`;
+}
+document.addEventListener('input',calc);document.addEventListener('change',calc);calc();
+</script>
+</body>
+</html>
