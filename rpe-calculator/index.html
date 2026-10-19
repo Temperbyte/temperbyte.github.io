@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RPE Calculator: RPE and RIR to Percent of 1RM and Working Weight</title>
+<meta name="description" content="Free RPE calculator for coaches. Turn reps and RPE (or reps in reserve) into a percent of one rep max, estimate a 1RM from a set, and get the working weight for the next session, rounded to your plates. kg or lb.">
+<link rel="canonical" href="https://temperbyte.github.io/rpe-calculator/">
+<meta property="og:title" content="RPE Calculator">
+<meta property="og:description" content="Reps and RPE in, percent of 1RM, estimated max and working weight out.">
+<meta property="og:image" content="https://temperbyte.github.io/assets/social/20-rpe-calculator.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/site.css">
+<style>td.hi{font-weight:600;color:var(--rust)}</style>
+</head>
+<body>
+<div class="wrap">
+<header class="site"><a class="brand" href="/"><i></i>Temperbyte</a><nav><a href="/">Free tools</a><a href="https://payhip.com/Temperbyte">Store</a></nav></header>
+
+<h1>RPE calculator</h1>
+<p class="lede">Enter a set your client just did to estimate their max, then pick the reps and RPE for the next session to get the weight to load. RPE 8 means about 2 reps left in the tank.</p>
+
+<form class="tool" id="f" autocomplete="off" onsubmit="return false">
+  <fieldset>
+    <legend>The set they did</legend>
+    <div class="grid">
+      <div><label for="w">Weight</label><input id="w" inputmode="decimal" value="100"></div>
+      <div><label for="r">Reps</label><input id="r" inputmode="numeric" value="5"></div>
+      <div><label for="e">RPE</label><select id="e"></select></div>
+    </div>
+  </fieldset>
+  <fieldset>
+    <legend>The next session</legend>
+    <div class="grid">
+      <div><label for="tr">Target reps</label><input id="tr" inputmode="numeric" value="3"></div>
+      <div><label for="te">Target RPE</label><select id="te"></select></div>
+      <div><label for="u">Units and plates</label><select id="u"><option value="kg2.5">kg, round to 2.5</option><option value="kg1">kg, round to 1</option><option value="lb5">lb, round to 5</option><option value="lb2.5">lb, round to 2.5</option></select></div>
+    </div>
+    <p class="note" style="margin-top:10px">Know the 1RM already? <label for="m" style="display:inline">Enter it here instead</label> <input id="m" inputmode="decimal" style="width:7em;display:inline-block" placeholder="optional"></p>
+  </fieldset>
+  <div class="result" id="out" aria-live="polite"></div>
+</form>
+
+<h2>How RPE and RIR work</h2>
+<p>RPE (rating of perceived exertion) on a 1 to 10 scale describes how hard a set was. In strength training it is usually read as reps in reserve (RIR): RPE 10 is no reps left, RPE 9 is one left, RPE 8 is two left, and half points mean "maybe one more".</p>
+<h3>How the calculator works</h3>
+<ul>
+<li>Reps done plus reps in reserve gives the reps the lifter could have done to failure. A set of 5 at RPE 8 is about a 7-rep max.</li>
+<li>A standard RPE chart turns that into a percent of one rep max (a 7-rep max is about 81% of 1RM). Half points are interpolated.</li>
+<li>Estimated 1RM = weight ÷ that percent. Working weight = 1RM × the percent for the target reps and RPE, rounded down to your plates.</li>
+</ul>
+<h3>Use it as a starting point</h3>
+<p>The chart is an average. People who are newer to lifting tend to misjudge RPE, and some lifters can do more reps at a given percent than others. Use the number for the first set, then let the RPE of that set adjust the rest. Charts like this are least accurate for sets above about 10 reps.</p>
+<p class="note">A training aid, not medical advice. Pain, dizziness or form breaking down are reasons to stop the set, not to hit a number.</p>
+
+<div class="cta">
+  <p><strong>Planning the next block?</strong> The Program Progression skill for Claude reads a client's training log, works out what progressed and what stalled lift by lift, and writes the next 4-week block with loads, reps and RPE targets and the reason for each change.</p>
+  <a class="btn" href="https://payhip.com/b/gpAwi">See Program Progression</a>
+  <p class="note" style="margin-top:12px">Or try the free <a href="/progressive-overload-calculator/">progressive overload calculator</a> and <a href="/training-volume-calculator/">training volume calculator</a>.</p>
+</div>
+
+<figure class="share"><img src="../assets/social/20-rpe-calculator.png" alt="RPE calculator: percent of 1RM and working weight from reps and RPE" width="200" height="300"><figcaption class="note">Useful? Save it to Pinterest or share the link with a colleague.</figcaption></figure>
+
+<footer class="site">Made by Temperbyte. Free tools and Claude skills for real estate agents and fitness coaches. <a href="https://payhip.com/Temperbyte">Store</a> · <a href="https://github.com/Temperbyte/temperbyte-skills.">Free skills on GitHub</a> · <a href="https://www.pinterest.com/temperbyte/">Pinterest</a> · <a href="https://x.com/Temperbyte_AI">X</a> · <a href="https://www.tiktok.com/@temperbyte_skills">TikTok</a></footer>
+</div>
+
+<script>
+const $=s=>document.querySelector(s);
+// % of 1RM for an N-rep max (N = reps + reps in reserve), standard RPE chart values
+const MAXPCT=[null,100,95.5,92.2,89.2,86.3,83.7,81.1,78.6,76.2,73.9,70.7,68.0,65.3,62.6,59.9];
+const MAXN=MAXPCT.length-1;
+function pct(reps,rpe){const n=reps+(10-rpe);if(n<1||n>MAXN)return null;const lo=Math.floor(n),hi=Math.ceil(n);return lo===hi?MAXPCT[lo]:(MAXPCT[lo]+MAXPCT[hi])/2}
+const RPES=[10,9.5,9,8.5,8,7.5,7,6.5,6];
+for(const id of ['e','te']){const s=$('#'+id);s.innerHTML=RPES.map(r=>`<option value="${r}">${r} (${10-r} in reserve)</option>`).join('');s.value=id==='e'?'8':'8.5'}
+const val=id=>{const t=String($(id).value).trim().replace(',','.');if(t==='')return null;const x=parseFloat(t);return isFinite(x)?x:NaN};
+function calc(){
+  const out=$('#out'), u=$('#u').value, unit=u.slice(0,2), step=parseFloat(u.slice(2));
+  const W=val('#w'), R=val('#r'), E=+$('#e').value, TR=val('#tr'), TE=+$('#te').value, M=val('#m');
+  const f=x=>(Math.round(x*10)/10).toLocaleString('en-US');
+  const down=x=>Math.floor(x/step+1e-9)*step;
+  let max, how;
+  if(M!==null){
+    if(isNaN(M)||M<=0){out.innerHTML='<p class="note">Enter the 1RM as a number above 0, or leave it empty.</p>';return}
+    max=M; how=`1RM entered: ${f(M)} ${unit}.`;
+  } else {
+    if([W,R].some(x=>x===null||isNaN(x))||W<=0||R<1||!Number.isInteger(R)){out.innerHTML='<p class="note">Enter the weight and a whole number of reps (1 or more) for the set they did.</p>';return}
+    const p=pct(R,E);
+    if(p===null){out.innerHTML=`<p class="note">${R} reps at RPE ${E} is about a ${R+10-E}-rep max, which is past the end of the chart (${MAXN}). Use a heavier set with fewer reps to estimate the max.</p>`;return}
+    max=W/(p/100); how=`${R} reps at RPE ${E} ≈ a ${R+10-E}-rep max ≈ ${p.toFixed(1)}% of 1RM. ${f(W)} ÷ ${(p/100).toFixed(4)} = ${f(max)} ${unit} estimated 1RM.`;
+  }
+  if(TR===null||isNaN(TR)||TR<1||!Number.isInteger(TR)){out.innerHTML=`<p class="headline">Estimated 1RM: <b>${f(max)} ${unit}</b></p><p class="note">${how}</p><p class="note">Enter whole target reps to get the working weight.</p>`;return}
+  const tp=pct(TR,TE);
+  if(tp===null){out.innerHTML=`<p class="headline">Estimated 1RM: <b>${f(max)} ${unit}</b></p><p class="note">${TR} reps at RPE ${TE} is past the end of the chart. Pick fewer reps or a higher RPE.</p>`;return}
+  const load=down(max*tp/100);
+  const repsCols=[1,2,3,4,5,6,8,10], rpeRows=[10,9,8,7];
+  const tbl=rpeRows.map(e=>`<tr><td>RPE ${e}</td>${repsCols.map(r=>{const p=pct(r,e);return `<td class="n ${r===TR&&e===TE?'hi':''}">${p===null?'–':f(down(max*p/100))}</td>`}).join('')}</tr>`).join('');
+  const notes=[how,`Target ${TR} reps at RPE ${TE} ≈ ${tp.toFixed(1)}% of 1RM. ${f(max)} × ${(tp/100).toFixed(4)} = ${f(max*tp/100)}, rounded down to ${f(load)} ${unit}.`];
+  if(M===null&&R>10) notes.push('The estimate is less reliable from sets above 10 reps.');
+  if(M===null&&E<7) notes.push('RPE below 7 is hard to judge accurately, so this estimate is rough.');
+  out.innerHTML=`<p class="headline">Load <b>${f(load)} ${unit}</b> for ${TR} rep${TR>1?'s':''} at RPE ${TE}</p>
+  <p>Estimated 1RM: ${f(max)} ${unit}.</p>
+  ${notes.map(t=>`<p class="note">${t}</p>`).join('')}
+  <h3>Working weights from this max (${unit})</h3>
+  <div class="scroll"><table><thead><tr><th></th>${repsCols.map(r=>`<th class="n">${r} rep${r>1?'s':''}</th>`).join('')}</tr></thead><tbody>${tbl}</tbody></table></div>`;
+}
+document.addEventListener('input',calc);document.addEventListener('change',calc);calc();
+</script>
+</body>
+</html>

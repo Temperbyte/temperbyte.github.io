@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Seller Net Sheet Calculator: Estimate a Home Seller's Net Proceeds</title>
+<meta name="description" content="Free seller net sheet calculator for real estate agents. Enter the sale price, mortgage payoff, commission, closing costs and concessions to estimate the seller's net proceeds, with the math shown and a price scenario table.">
+<link rel="canonical" href="https://temperbyte.github.io/seller-net-sheet-calculator/">
+<meta property="og:title" content="Seller Net Sheet Calculator">
+<meta property="og:description" content="Sale price, payoff and costs in, the seller's estimated net out, line by line.">
+<meta property="og:image" content="https://temperbyte.github.io/assets/social/19-seller-net-sheet.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/site.css">
+<style>tr.total td{font-weight:600;border-top:2px solid var(--ink);border-bottom:0}tr.cur td{font-weight:600}</style>
+</head>
+<body>
+<div class="wrap">
+<header class="site"><a class="brand" href="/"><i></i>Temperbyte</a><nav><a href="/">Free tools</a><a href="https://payhip.com/Temperbyte">Store</a></nav></header>
+
+<h1>Seller net sheet calculator</h1>
+<p class="lede">Estimate what your seller walks away with. Enter the price and every cost you know; leave the rest empty. The math is shown line by line so you can walk the seller through it.</p>
+
+<form class="tool" id="f" autocomplete="off" onsubmit="return false">
+  <fieldset>
+    <legend>Sale and loans</legend>
+    <div class="grid">
+      <div><label for="price">Sale price ($)</label><input id="price" inputmode="decimal" value="450,000"></div>
+      <div><label for="payoff">Mortgage payoff ($)</label><input id="payoff" inputmode="decimal" value="262,000"></div>
+      <div><label for="liens">Other loans or liens ($)</label><input id="liens" inputmode="decimal" value=""></div>
+    </div>
+  </fieldset>
+  <fieldset>
+    <legend>Commission</legend>
+    <div class="grid">
+      <div><label for="lc">Listing side (%)</label><input id="lc" inputmode="decimal" value="2.5"></div>
+      <div><label for="bc">Buyer side paid by seller (%)</label><input id="bc" inputmode="decimal" value="2.5"></div>
+      <div><label for="flat">Flat brokerage fee ($)</label><input id="flat" inputmode="decimal" value=""></div>
+    </div>
+  </fieldset>
+  <fieldset>
+    <legend>Closing costs (use your local numbers)</legend>
+    <div class="grid">
+      <div><label for="tt">Transfer tax (%)</label><input id="tt" inputmode="decimal" value="0.4"></div>
+      <div><label for="title">Title and escrow ($)</label><input id="title" inputmode="decimal" value="2,100"></div>
+      <div><label for="atty">Attorney fees ($)</label><input id="atty" inputmode="decimal" value=""></div>
+      <div><label for="tax">Property tax owed at closing ($)</label><input id="tax" inputmode="decimal" value="1,850"></div>
+      <div><label for="hoa">HOA fees and transfer ($)</label><input id="hoa" inputmode="decimal" value=""></div>
+      <div><label for="other">Other costs ($)</label><input id="other" inputmode="decimal" value="350"></div>
+    </div>
+  </fieldset>
+  <fieldset>
+    <legend>Concessions and repairs</legend>
+    <div class="grid">
+      <div><label for="cc">Seller credit to buyer ($)</label><input id="cc" inputmode="decimal" value="5,000"></div>
+      <div><label for="rep">Repairs or repair credits ($)</label><input id="rep" inputmode="decimal" value=""></div>
+      <div><label for="hw">Home warranty ($)</label><input id="hw" inputmode="decimal" value=""></div>
+    </div>
+  </fieldset>
+  <div class="result" id="out" aria-live="polite"></div>
+</form>
+
+<h2>What goes on a seller net sheet</h2>
+<p>A net sheet starts with the sale price and subtracts everything that comes out of the seller's side at closing:</p>
+<ul>
+<li><strong>Loan payoffs:</strong> the mortgage payoff from the lender's payoff statement (not just the balance on the last statement, which leaves out interest to the closing date), plus any second mortgage, HELOC or lien.</li>
+<li><strong>Commission:</strong> whatever the seller agreed to pay, as a percent or a flat fee. Commissions are negotiable, and who pays the buyer's agent is set by the agreements in each deal.</li>
+<li><strong>Closing costs:</strong> transfer or excise tax, title and escrow or settlement fees, attorney fees and recording costs. These vary a lot by state, county and even city, so use numbers from your title company or attorney.</li>
+<li><strong>Prorations:</strong> property tax or HOA dues the seller owes up to the closing date. Depending on where you are, taxes may be paid in arrears or in advance, so the proration can be a cost or a credit.</li>
+<li><strong>Concessions:</strong> closing cost credits to the buyer, repair credits and anything else agreed in the contract.</li>
+</ul>
+<h3>Why the price scenario table helps</h3>
+<p>Sellers tend to think in list price, but decide on net. Showing the net at a few prices around the offer makes it easier to talk about a counter or a price change in the numbers that matter to them.</p>
+<p class="note">An estimate based on the numbers you enter, not a settlement statement. Confirm the payoff with the lender and the closing costs with the title company, escrow officer or attorney before giving the seller a final figure. Not legal or tax advice; capital gains and other taxes are not included.</p>
+
+<div class="cta">
+  <p><strong>Comparing more than one offer?</strong> The Offer Comparison skill for Claude puts every offer side by side, works out the seller's net for each one with the math shown, handles escalation clauses and credits, rates how likely each offer is to close, and writes a summary you can send to the seller.</p>
+  <a class="btn" href="https://payhip.com/b/sfl8H">See Offer Comparison</a>
+  <p class="note" style="margin-top:12px">Or try the free <a href="/escalation-clause-calculator/">escalation clause calculator</a> and <a href="/appraisal-gap-calculator/">appraisal gap calculator</a>.</p>
+</div>
+
+<figure class="share"><img src="../assets/social/19-seller-net-sheet.png" alt="Seller net sheet calculator: estimate the seller's net proceeds" width="200" height="300"><figcaption class="note">Useful? Save it to Pinterest or share the link with a colleague.</figcaption></figure>
+
+<footer class="site">Made by Temperbyte. Free tools and Claude skills for real estate agents and fitness coaches. <a href="https://payhip.com/Temperbyte">Store</a> · <a href="https://github.com/Temperbyte/temperbyte-skills.">Free skills on GitHub</a> · <a href="https://www.pinterest.com/temperbyte/">Pinterest</a> · <a href="https://x.com/Temperbyte_AI">X</a> · <a href="https://www.tiktok.com/@temperbyte_skills">TikTok</a></footer>
+</div>
+
+<script>
+const $=s=>document.querySelector(s);
+const num=id=>{const t=String($(id).value).replace(/[$,\s%]/g,'');if(t==='')return 0;const x=parseFloat(t);return isFinite(x)?x:NaN};
+const usd=x=>(x<0?'-$':'$')+Math.abs(Math.round(x)).toLocaleString('en-US');
+const FIELDS=['price','payoff','liens','lc','bc','flat','tt','title','atty','tax','hoa','other','cc','rep','hw'];
+function lines(P,v){
+  const L=[];
+  const add=(name,amt,how)=>{if(amt) L.push({name,amt,how})};
+  add('Mortgage payoff',v.payoff,'from the payoff statement');
+  add('Other loans or liens',v.liens,'');
+  add('Listing side commission',P*v.lc/100,`${v.lc}% of ${usd(P)}`);
+  add('Buyer side commission',P*v.bc/100,`${v.bc}% of ${usd(P)}`);
+  add('Flat brokerage fee',v.flat,'');
+  add('Transfer tax',P*v.tt/100,`${v.tt}% of ${usd(P)}`);
+  add('Title and escrow',v.title,'');
+  add('Attorney fees',v.atty,'');
+  add('Property tax owed',v.tax,'proration');
+  add('HOA fees and transfer',v.hoa,'');
+  add('Other costs',v.other,'');
+  add('Seller credit to buyer',v.cc,'');
+  add('Repairs or repair credits',v.rep,'');
+  add('Home warranty',v.hw,'');
+  return L;
+}
+const net=(P,v)=>P-lines(P,v).reduce((a,l)=>a+l.amt,0);
+function calc(){
+  const out=$('#out'), v={};
+  for(const k of FIELDS) v[k]=num('#'+k);
+  const bad=FIELDS.filter(k=>isNaN(v[k])||v[k]<0);
+  if(bad.length){out.innerHTML=`<p class="note">Check this field: ${bad.map(k=>$('label[for='+k+']').textContent).join(', ')}. Use numbers only, 0 or more.</p>`;return}
+  const P=v.price;
+  if(!P){out.innerHTML='<p class="note">Enter the sale price to start.</p>';return}
+  if(['lc','bc','tt'].some(k=>v[k]>=50)){out.innerHTML='<p class="note">A percent field is 50 or more. Enter percentages like 2.5, not dollar amounts.</p>';return}
+  const L=lines(P,v), costs=L.reduce((a,l)=>a+l.amt,0), N=P-costs, sellCosts=costs-v.payoff-v.liens;
+  const head=N>=0?`Estimated net to the seller: <b>${usd(N)}</b>`:`The seller would need to bring <b>${usd(-N)}</b> to closing`;
+  const rows=L.map(l=>`<tr><td>${l.name}${l.how?`<br><span class="note">${l.how}</span>`:''}</td><td class="n">-${usd(l.amt)}</td></tr>`).join('');
+  const steps=[-.05,-.025,0,.025].map(k=>{const p=Math.round(P*(1+k)/1000)*1000;return {p:k===0?P:p,k}});
+  const sc=steps.map(s=>`<tr class="${s.k===0?'cur':''}"><td>${usd(s.p)}${s.k===0?' (entered)':''}</td><td class="n">${usd(net(s.p,v))}</td><td class="n">${usd(net(s.p,v)-N)}</td></tr>`).join('');
+  const notes=[];
+  notes.push(`Selling costs (everything except loan payoffs) come to ${usd(sellCosts)}, or ${(sellCosts/P*100).toFixed(1)}% of the price.`);
+  if(!v.payoff&&!v.liens) notes.push('No mortgage payoff entered. If the home has a loan, this net is too high.');
+  if(N<0) notes.push('A negative net means the costs and payoffs are more than the price. Talk with the lender and the seller before listing at this price.');
+  out.innerHTML=`<p class="headline">${head}</p>
+  <div class="scroll"><table><thead><tr><th>Item</th><th class="n">Amount</th></tr></thead><tbody>
+  <tr><td>Sale price</td><td class="n">${usd(P)}</td></tr>${rows}
+  <tr class="total"><td>Estimated net</td><td class="n">${usd(N)}</td></tr></tbody></table></div>
+  ${notes.map(t=>`<p class="note">${t}</p>`).join('')}
+  <h3>Net at other prices</h3>
+  <div class="scroll"><table><thead><tr><th>Sale price</th><th class="n">Net</th><th class="n">Change</th></tr></thead><tbody>${sc}</tbody></table></div>
+  <p class="note">Percent-based costs move with the price; flat costs and payoffs stay the same.</p>`;
+}
+document.addEventListener('input',calc);calc();
+</script>
+</body>
+</html>

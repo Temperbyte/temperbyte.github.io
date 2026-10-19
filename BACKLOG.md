@@ -21,9 +21,22 @@ nothing sent anywhere. Never invent statistics or legal rules; when a convention
 - [x] 2026-10-17 Client adherence calculator → Check-in Analyzer (https://payhip.com/b/7gC9P)
 - [x] 2026-10-17 Months of inventory calculator → Pricing Brief (https://payhip.com/b/7mleY)
 
+- [x] 2026-10-19 Seller net sheet calculator → Offer Comparison (https://payhip.com/b/sfl8H)
+- [x] 2026-10-19 RPE calculator → Program Progression (https://payhip.com/b/gpAwi)
+
 ## Next (in this order)
 
-- [ ] (empty: research the next ideas for the same two audiences, each linked to an existing paid skill)
+Researched 2026-10-19. Ranked by how often the audience needs it in real work, how directly it leads to the paid skill,
+and whether we can do it honestly without inventing local rules. Competing coach tools (e.g. coachway.io) show these are real search topics.
+
+- [ ] Online coaching client capacity calculator → Check-in Analyzer (https://payhip.com/b/7gC9P). Hours per week, minutes per check-in and per message, clients you can take, and what shaving minutes off each check-in frees up. No invented time savings: the coach enters both numbers.
+- [ ] Sale-to-list price ratio calculator → Pricing Brief (https://payhip.com/b/7mleY). Per sale and median for a set of comps, with original vs. final list price.
+- [ ] Weight loss rate calculator (% of body weight per week, goal date) → Check-in Analyzer (https://payhip.com/b/7gC9P). Show the common 0.5–1% per week guidance as a range, not a rule.
+- [ ] One rep max calculator (Epley, Brzycki, Lombardi side by side) → Program Progression (https://payhip.com/b/gpAwi).
+- [ ] Price per square foot calculator with adjustments → Pricing Brief (https://payhip.com/b/7mleY).
+- [ ] Showing feedback scorecard → Seller Update (https://payhip.com/b/UXnhj). Tally showing feedback by theme (price, condition, layout, location) and turn it into a one-line seller summary.
+- [ ] Protein target calculator (g per kg range) → Intake to Program (https://payhip.com/b/gVueK). Cite the source of the range on the page.
+- [ ] Real estate commission calculator (total, split, brokerage share) → Offer Comparison (https://payhip.com/b/sfl8H). Note that commissions are negotiable and vary.
 
 ## Rules for the weekly build
 
