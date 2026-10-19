@@ -36,7 +36,7 @@
     <div class="grid">
       <div><label for="tr">Target reps</label><input id="tr" inputmode="numeric" value="3"></div>
       <div><label for="te">Target RPE</label><select id="te"></select></div>
-      <div><label for="u">Units and plates</label><select id="u"><option value="kg2.5">kg, round to 2.5</option><option value="kg1">kg, round to 1</option><option value="lb5">lb, round to 5</option><option value="lb2.5">lb, round to 2.5</option></select></div>
+      <div><label for="u">Units and plates</label><select id="u"><option value="kg2.5">kg, 2.5 steps</option><option value="kg1">kg, 1 steps</option><option value="lb5">lb, 5 steps</option><option value="lb2.5">lb, 2.5 steps</option></select></div>
     </div>
     <p class="note" style="margin-top:10px">Know the 1RM already? <label for="m" style="display:inline">Enter it here instead</label> <input id="m" inputmode="decimal" style="width:7em;display:inline-block" placeholder="optional"></p>
   </fieldset>
@@ -73,7 +73,7 @@ const MAXPCT=[null,100,95.5,92.2,89.2,86.3,83.7,81.1,78.6,76.2,73.9,70.7,68.0,65
 const MAXN=MAXPCT.length-1;
 function pct(reps,rpe){const n=reps+(10-rpe);if(n<1||n>MAXN)return null;const lo=Math.floor(n),hi=Math.ceil(n);return lo===hi?MAXPCT[lo]:(MAXPCT[lo]+MAXPCT[hi])/2}
 const RPES=[10,9.5,9,8.5,8,7.5,7,6.5,6];
-for(const id of ['e','te']){const s=$('#'+id);s.innerHTML=RPES.map(r=>`<option value="${r}">${r} (${10-r} in reserve)</option>`).join('');s.value=id==='e'?'8':'8.5'}
+for(const id of ['e','te']){const s=$('#'+id);s.innerHTML=RPES.map(r=>`<option value="${r}">${r} (RIR ${10-r})</option>`).join('');s.value=id==='e'?'8':'8.5'}
 const val=id=>{const t=String($(id).value).trim().replace(',','.');if(t==='')return null;const x=parseFloat(t);return isFinite(x)?x:NaN};
 function calc(){
   const out=$('#out'), u=$('#u').value, unit=u.slice(0,2), step=parseFloat(u.slice(2));
