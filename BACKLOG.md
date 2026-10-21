@@ -3,7 +3,7 @@
 The weekly build takes the first unchecked item, builds it, and ticks it with the date and URL.
 Every calculator: one static page at `/<slug>/index.html`, same structure and `assets/site.css` as the existing calculators
 (header nav "Free tools" + "Store", h1, lede, `form.tool`, live result in `#out`, explanation sections, `.note` disclaimer,
-`.cta` to the matching paid skill, `figure.share` with the pin image, standard footer), plain JavaScript, no libraries,
+`.cta` to the matching paid skill (Payhip links carry `?utm_source=temperbyte.github.io&utm_medium=calculator&utm_campaign=<slug>`), `figure.share` with the pin image, standard footer), plain JavaScript, no libraries,
 nothing sent anywhere. Never invent statistics or legal rules; when a convention varies by market, say so on the page.
 
 ## Done
@@ -23,14 +23,14 @@ nothing sent anywhere. Never invent statistics or legal rules; when a convention
 
 - [x] 2026-10-19 Seller net sheet calculator → Offer Comparison (https://payhip.com/b/sfl8H)
 - [x] 2026-10-19 RPE calculator → Program Progression (https://payhip.com/b/gpAwi)
+- [x] 2026-10-21 Client capacity calculator → Check-in Analyzer (https://payhip.com/b/7gC9P)
+- [x] 2026-10-21 Sale-to-list ratio calculator → Pricing Brief (https://payhip.com/b/7mleY)
 
 ## Next (in this order)
 
 Researched 2026-10-19. Ranked by how often the audience needs it in real work, how directly it leads to the paid skill,
 and whether we can do it honestly without inventing local rules. Competing coach tools (e.g. coachway.io) show these are real search topics.
 
-- [ ] Online coaching client capacity calculator → Check-in Analyzer (https://payhip.com/b/7gC9P). Hours per week, minutes per check-in and per message, clients you can take, and what shaving minutes off each check-in frees up. No invented time savings: the coach enters both numbers.
-- [ ] Sale-to-list price ratio calculator → Pricing Brief (https://payhip.com/b/7mleY). Per sale and median for a set of comps, with original vs. final list price.
 - [ ] Weight loss rate calculator (% of body weight per week, goal date) → Check-in Analyzer (https://payhip.com/b/7gC9P). Show the common 0.5–1% per week guidance as a range, not a rule.
 - [ ] One rep max calculator (Epley, Brzycki, Lombardi side by side) → Program Progression (https://payhip.com/b/gpAwi).
 - [ ] Price per square foot calculator with adjustments → Pricing Brief (https://payhip.com/b/7mleY).

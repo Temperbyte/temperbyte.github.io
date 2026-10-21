@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sale-to-List Price Ratio Calculator for Real Estate Comps</title>
+<meta name="description" content="Free sale-to-list price ratio calculator for real estate agents. Paste recent sales with their list prices to get each ratio, the median and average, how many sold over or under list, and the ratio to the original list price.">
+<link rel="canonical" href="https://temperbyte.github.io/sale-to-list-ratio-calculator/">
+<meta property="og:title" content="Sale-to-List Price Ratio Calculator">
+<meta property="og:description" content="Paste sales and list prices, get each ratio, the median and how many sold over list.">
+<meta property="og:image" content="https://temperbyte.github.io/assets/social/22-sale-to-list.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/site.css">
+<style>td.up{color:var(--ok)}td.down{color:var(--rust)}</style>
+</head>
+<body>
+<div class="wrap">
+<header class="site"><a class="brand" href="/"><i></i>Temperbyte</a><nav><a href="/">Free tools</a><a href="https://payhip.com/Temperbyte">Store</a></nav></header>
+
+<h1>Sale-to-list price ratio calculator</h1>
+<p class="lede">How close to the asking price are homes really selling? Paste recent sales, one per line, and see each ratio, the median and how many sold over or under list.</p>
+
+<form class="tool" id="f" autocomplete="off" onsubmit="return false">
+  <fieldset>
+    <label for="t">One sale per line: sale price, final list price, original list price (optional), name (optional)</label>
+    <textarea id="t" spellcheck="false">412000, 405000, , 14 Elm St
+398500, 399900, , 22 Oak Ave
+425000, 429000, 449000, 8 Birch Ct
+389000, 389000, , 31 Pine Rd
+440000, 425000, , 5 Maple Ln
+371000, 384900, 399000, 17 Cedar Dr</textarea>
+  </fieldset>
+  <fieldset>
+    <div class="grid">
+      <div><label for="lp">Your listing's price (optional)</label><input id="lp" inputmode="decimal" value=""></div>
+    </div>
+  </fieldset>
+  <div class="result" id="out" aria-live="polite"></div>
+</form>
+
+<h2>What the ratio means</h2>
+<p><strong>Sale-to-list ratio</strong> = sale price ÷ list price × 100. At 100% the home sold at its asking price, above 100% it sold over, and below 100% under.</p>
+<ul>
+<li><strong>Final vs. original list:</strong> a home that sold at 99% of its final price may have sold at 95% of its first price after two reductions. Comparing both shows how much the market pushed back on the first price.</li>
+<li><strong>Median, not average:</strong> one bidding war at 110% can lift an average a lot. The median shows the typical sale.</li>
+<li><strong>Same area, same type, recent:</strong> use closed sales of similar homes from the last 3 to 6 months. A ratio from another price band or neighborhood can mislead.</li>
+</ul>
+<h3>How to use it with a seller</h3>
+<p>The ratio shows how buyers in this market respond to asking prices, not what a home is worth. A high ratio can mean homes were priced right, priced low on purpose, or that the market is hot. Pair it with price per square foot from the comps and with months of inventory.</p>
+<p class="note">Arithmetic on the prices you enter, not an appraisal or a forecast. Use your MLS's closed sale data.</p>
+
+<div class="cta">
+  <p><strong>Pricing a listing this week?</strong> The Pricing Brief skill for Claude turns pasted comps into price per square foot math, outliers explained, a suggested list range with confidence, market signals and seller talking points.</p>
+  <a class="btn" href="https://payhip.com/b/7mleY?utm_source=temperbyte.github.io&amp;utm_medium=calculator&amp;utm_campaign=sale-to-list-ratio-calculator">See Pricing Brief</a>
+  <p class="note" style="margin-top:12px">Or try the free <a href="/comps-price-calculator/">comps price calculator</a> and <a href="/months-of-inventory-calculator/">months of inventory calculator</a>.</p>
+</div>
+
+<figure class="share"><img src="../assets/social/22-sale-to-list.png" alt="Sale-to-list price ratio calculator for real estate agents" width="200" height="300"><figcaption class="note">Useful? Save it to Pinterest or share the link with a colleague.</figcaption></figure>
+
+<footer class="site">Made by Temperbyte. Free tools and Claude skills for real estate agents and fitness coaches. <a href="https://payhip.com/Temperbyte">Store</a> · <a href="https://github.com/Temperbyte/temperbyte-skills.">Free skills on GitHub</a> · <a href="https://www.pinterest.com/temperbyte/">Pinterest</a> · <a href="https://x.com/Temperbyte_AI">X</a> · <a href="https://www.tiktok.com/@temperbyte_skills">TikTok</a></footer>
+</div>
+
+<script>
+const $=s=>document.querySelector(s);
+const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;');
+function price(t){
+  t=String(t||'').trim().toLowerCase().replace(/[$€£\s]/g,'');
+  if(!t) return null;
+  let mult=1;
+  if(/k$/.test(t)){mult=1e3;t=t.slice(0,-1)} else if(/m$/.test(t)){mult=1e6;t=t.slice(0,-1)}
+  t=t.replace(/,(?=\d{3}(\D|$))/g,'');
+  const x=parseFloat(t);
+  return isFinite(x)&&x>0?x*mult:NaN;
+}
+function splitLine(line){
+  // tabs (pasted from a spreadsheet) or ";" or ", " separate columns; "412,000" keeps its comma
+  if(/\t/.test(line)) return line.split('\t');
+  if(/;/.test(line)) return line.split(';');
+  return line.split(/,(?!\d{3}\b)/);       // a comma followed by exactly 3 digits is a thousands comma
+}
+const median=a=>{const s=[...a].sort((x,y)=>x-y),n=s.length;return n%2?s[(n-1)/2]:(s[n/2-1]+s[n/2])/2};
+const usd=x=>'$'+Math.round(x).toLocaleString('en-US');
+const pct=x=>x.toFixed(1)+'%';
+function calc(){
+  const out=$('#out'), rows=[], bad=[];
+  $('#t').value.split('\n').forEach((line,i)=>{
+    if(!line.trim()) return;
+    const c=splitLine(line).map(s=>s.trim());
+    const sale=price(c[0]),list=price(c[1]),orig=price(c[2]);
+    if(sale===null||list===null||isNaN(sale)||isNaN(list)||isNaN(orig)){bad.push(i+1);return}
+    rows.push({sale,list,orig:orig||null,name:(c.slice(3).join(', ')||'').trim()||`Sale ${rows.length+1}`,r:sale/list*100,ro:orig?sale/orig*100:null});
+  });
+  if(!rows.length){out.innerHTML=`<p class="note">${bad.length?`Line ${bad.join(', ')} couldn't be read. `:''}Enter at least one sale as: sale price, list price.</p>`;return}
+  const rs=rows.map(r=>r.r), med=median(rs), avg=rs.reduce((a,b)=>a+b,0)/rs.length;
+  const over=rows.filter(r=>r.r>100.05).length, at=rows.filter(r=>Math.abs(r.r-100)<=0.05).length, under=rows.length-over-at;
+  const withO=rows.filter(r=>r.ro!==null);
+  const word=med>=100.5?'over':med<=99.5?'under':'about at';
+  const head=`Median sale-to-list: <b>${pct(med)}</b>`;
+  const tr=rows.map(r=>`<tr><td>${esc(r.name)}</td><td class="n">${usd(r.sale)}</td><td class="n">${usd(r.list)}</td><td class="n ${r.r>100.05?'up':r.r<99.95?'down':''}">${pct(r.r)}</td><td class="n">${r.ro===null?'–':pct(r.ro)}</td></tr>`).join('');
+  const notes=[`${rows.length} sale${rows.length>1?'s':''}: ${over} over list, ${at} at list, ${under} under. Average ${pct(avg)}.`];
+  if(withO.length) notes.push(`${withO.length} sale${withO.length>1?'s':''} had a price change: median ${pct(median(withO.map(r=>r.ro)))} of the original list price, vs. ${pct(median(withO.map(r=>r.r)))} of the final one.`);
+  if(Math.abs(avg-med)>=1.5) notes.push('The average and median are far apart, so one or two sales are pulling the average. Trust the median more.');
+  if(rows.length<5) notes.push('With fewer than 5 sales, one sale changes the picture a lot.');
+  if(bad.length) notes.push(`Line ${bad.join(', ')} couldn't be read and was left out.`);
+  const lp=price($('#lp').value);
+  let lpLine='';
+  if(lp&&!isNaN(lp)) lpLine=`<p>If your listing sold like the median here, ${usd(lp)} × ${pct(med)} ≈ <strong>${usd(lp*med/100)}</strong>. That's what buyers have paid relative to asking, not a valuation.</p>`;
+  else if(lp!==null&&isNaN(lp)) notes.push("Your listing's price couldn't be read.");
+  out.innerHTML=`<p class="headline">${head}</p><p>The typical home here sold ${word} its asking price.</p>${lpLine}
+  <div class="scroll"><table><thead><tr><th>Sale</th><th class="n">Sold</th><th class="n">List</th><th class="n">Sale/list</th><th class="n">Sale/original</th></tr></thead><tbody>${tr}</tbody></table></div>
+  ${notes.map(t=>`<p class="note">${t}</p>`).join('')}`;
+}
+document.addEventListener('input',calc);calc();
+</script>
+</body>
+</html>

@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Online Coaching Client Capacity Calculator: How Many Clients Can You Take?</title>
+<meta name="description" content="Free client capacity calculator for online coaches and personal trainers. Enter your coaching hours and the minutes each client takes for check-ins, messages and programming to see how many clients you can handle and what faster check-ins would free up.">
+<link rel="canonical" href="https://temperbyte.github.io/client-capacity-calculator/">
+<meta property="og:title" content="Client Capacity Calculator for Online Coaches">
+<meta property="og:description" content="Your hours and minutes per client in, how many clients you can take out.">
+<meta property="og:image" content="https://temperbyte.github.io/assets/social/21-client-capacity.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/site.css">
+<style>.meter{height:10px;background:var(--rule);position:relative;margin:4px 0 14px}.meter i{position:absolute;left:0;top:0;bottom:0;background:var(--ink)}.meter i.over{background:var(--rust)}tr.cur td{font-weight:600}</style>
+</head>
+<body>
+<div class="wrap">
+<header class="site"><a class="brand" href="/"><i></i>Temperbyte</a><nav><a href="/">Free tools</a><a href="https://payhip.com/Temperbyte">Store</a></nav></header>
+
+<h1>Client capacity calculator</h1>
+<p class="lede">How many online clients can you coach well in the hours you have? Enter your weekly coaching hours and how long each client really takes.</p>
+
+<form class="tool" id="f" autocomplete="off" onsubmit="return false">
+  <fieldset>
+    <legend>Your week</legend>
+    <div class="grid">
+      <div><label for="hrs">Hours a week for client work</label><input id="hrs" inputmode="decimal" value="15"></div>
+      <div><label for="cur">Clients you have now</label><input id="cur" inputmode="numeric" value="18"></div>
+      <div><label for="fee">Monthly fee per client (optional)</label><input id="fee" inputmode="decimal" value="150"></div>
+    </div>
+  </fieldset>
+  <fieldset>
+    <legend>Minutes per client</legend>
+    <div class="grid">
+      <div><label for="ci">Weekly check-in review and reply</label><input id="ci" inputmode="decimal" value="25"></div>
+      <div><label for="msg">Messages per week</label><input id="msg" inputmode="decimal" value="15"></div>
+      <div><label for="prog">Program updates per month</label><input id="prog" inputmode="decimal" value="45"></div>
+    </div>
+  </fieldset>
+  <fieldset>
+    <div class="grid">
+      <div><label for="goal">Check-in minutes you'd like to get to</label><input id="goal" inputmode="decimal" value="10"></div>
+    </div>
+  </fieldset>
+  <div class="result" id="out" aria-live="polite"></div>
+</form>
+
+<h2>How it's calculated</h2>
+<ul>
+<li><strong>Minutes per client per week</strong> = check-in time + message time + program time ÷ 4.33 (the average number of weeks in a month).</li>
+<li><strong>Clients you can take</strong> = your weekly hours × 60 ÷ minutes per client, rounded down.</li>
+<li><strong>Load</strong> = the time your current clients need ÷ the time you have.</li>
+</ul>
+<h3>Where the time goes</h3>
+<p>For most online coaches the weekly check-in is the biggest single block: reading the log, doing the weight trend math, deciding whether to change anything and writing a reply. Time it honestly for a week before you trust the numbers. Leave some slack too: onboarding new clients, sales calls and content are not in this calculation.</p>
+<h3>Why aim below 100%</h3>
+<p>A schedule that is full on paper has no room for a client who needs extra help in a hard week. Many coaches aim for about 80 to 90% so quality doesn't drop when life happens. That's a planning habit, not a rule.</p>
+<p class="note">Arithmetic on the times you enter. It doesn't know how long your clients really take; only your own timing does.</p>
+
+<div class="cta">
+  <p><strong>Want check-ins to take minutes, not half an hour?</strong> The Check-in Analyzer skill for Claude reads a pasted check-in, does the weight trend and adherence math, makes the hold, adjust or review call with the reason, flags red flags, and writes a ready-to-send reply in your voice.</p>
+  <a class="btn" href="https://payhip.com/b/7gC9P?utm_source=temperbyte.github.io&amp;utm_medium=calculator&amp;utm_campaign=client-capacity-calculator">See Check-in Analyzer</a>
+  <p class="note" style="margin-top:12px">Or try the <a href="https://payhip.com/b/MOo7j?utm_source=temperbyte.github.io&amp;utm_medium=calculator&amp;utm_campaign=client-capacity-calculator">free lite version</a>, or the free <a href="/client-adherence-calculator/">client adherence calculator</a>.</p>
+</div>
+
+<figure class="share"><img src="../assets/social/21-client-capacity.png" alt="Client capacity calculator for online coaches" width="200" height="300"><figcaption class="note">Useful? Save it to Pinterest or share the link with a colleague.</figcaption></figure>
+
+<footer class="site">Made by Temperbyte. Free tools and Claude skills for real estate agents and fitness coaches. <a href="https://payhip.com/Temperbyte">Store</a> · <a href="https://github.com/Temperbyte/temperbyte-skills.">Free skills on GitHub</a> · <a href="https://www.pinterest.com/temperbyte/">Pinterest</a> · <a href="https://x.com/Temperbyte_AI">X</a> · <a href="https://www.tiktok.com/@temperbyte_skills">TikTok</a></footer>
+</div>
+
+<script>
+const $=s=>document.querySelector(s);
+const val=id=>{const t=String($(id).value).replace(/[$€,\s]/g,'');if(t==='')return null;const x=parseFloat(t);return isFinite(x)&&x>=0?x:NaN};
+const WEEKS=4.33;
+const f1=x=>(Math.round(x*10)/10).toLocaleString('en-US');
+const money=x=>'$'+Math.round(x).toLocaleString('en-US');
+function calc(){
+  const out=$('#out');
+  const H=val('#hrs'),C=val('#cur'),F=val('#fee'),CI=val('#ci'),M=val('#msg'),P=val('#prog'),G=val('#goal');
+  const need={'Hours a week':H,'Check-in minutes':CI};
+  const bad=Object.entries(need).filter(([k,v])=>v===null||isNaN(v)).map(([k])=>k);
+  if([C,F,M,P,G].some(v=>v!==null&&isNaN(v))) bad.push('a number field');
+  if(bad.length){out.innerHTML=`<p class="note">Fill in ${bad.join(', ')} with numbers (0 or more).</p>`;return}
+  if(H===0){out.innerHTML='<p class="note">Enter the hours you have for client work.</p>';return}
+  const per=(ci)=>ci+(M||0)+(P||0)/WEEKS;
+  const pc=per(CI);
+  if(pc<=0){out.innerHTML='<p class="note">Enter how many minutes each client takes.</p>';return}
+  const avail=H*60, cap=Math.floor(avail/pc+1e-9);
+  const load=C!==null?C*pc/avail*100:null;
+  let head=`You can coach about <b>${cap} client${cap===1?'':'s'}</b> in ${f1(H)} hours a week`;
+  const lines=[];
+  if(load!==null&&C>0){
+    const msg=load>100?`Your ${C} clients need ${f1(C*pc/60)} hours a week, ${f1(C*pc/60-H)} more than you have.`
+      :load>=90?`Your ${C} clients need ${f1(C*pc/60)} of your ${f1(H)} hours. You're nearly full.`
+      :`Your ${C} clients need ${f1(C*pc/60)} of your ${f1(H)} hours. Room for about ${cap-C} more.`;
+    lines.push(`<p>${msg}</p><div class="meter" role="img" aria-label="Load ${load.toFixed(0)} percent"><i class="${load>100?'over':''}" style="width:${Math.min(load,100).toFixed(1)}%"></i></div><p class="note">Load: ${load.toFixed(0)}% of your coaching time.</p>`);
+  }
+  const rows=[];
+  const opts=[CI];
+  if(G!==null&&G<CI) opts.push(G);
+  [0.75,0.5].forEach(k=>{const m=Math.round(CI*k);if(m>0&&!opts.includes(m)&&(G===null||m>G))opts.splice(1,0,m)});
+  opts.sort((a,b)=>b-a);
+  for(const m of opts){
+    const p=per(m),c=Math.floor(avail/p+1e-9),saved=C?(CI-m)*C/60:0;
+    rows.push(`<tr class="${m===CI?'cur':''}"><td>${f1(m)} min${m===CI?' (now)':''}</td><td class="n">${f1(p)}</td><td class="n">${c}</td><td class="n">${C?f1(saved)+' h':'–'}</td>${F?`<td class="n">${money(c*F)}</td>`:''}</tr>`);
+  }
+  const notes=[`Each client takes ${f1(CI)} + ${f1(M||0)} + ${f1(P||0)} ÷ ${WEEKS} = ${f1(pc)} minutes a week. ${f1(H)} h × 60 ÷ ${f1(pc)} = ${f1(avail/pc)}, rounded down to ${cap}.`];
+  if(F&&C) notes.push(C>cap?`At ${money(F)} a month your ${C} clients bring ${money(C*F)}, but at these times they need more hours than you have. Faster check-ins are what keep that income without longer weeks.`:`At ${money(F)} a month, your current clients bring ${money(C*F)} a month; a full roster of ${cap} would be ${money(cap*F)}.`);
+  out.innerHTML=`<p class="headline">${head}</p>${lines.join('')}
+  <h3>If check-ins took less time</h3>
+  <div class="scroll"><table><thead><tr><th>Check-in</th><th class="n">Min/client/week</th><th class="n">Clients you can take</th><th class="n">Hours saved now</th>${F?'<th class="n">Monthly at full</th>':''}</tr></thead><tbody>${rows.join('')}</tbody></table></div>
+  ${notes.map(t=>`<p class="note">${t}</p>`).join('')}`;
+}
+document.addEventListener('input',calc);calc();
+</script>
+</body>
+</html>
