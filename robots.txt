@@ -1,4 +1,3 @@
 User-agent: *
 Allow: /
-Disallow: /media/
 Sitemap: https://temperbyte.github.io/sitemap.xml
