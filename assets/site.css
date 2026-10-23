@@ -69,3 +69,5 @@ footer.site{margin:64px 0 40px;padding-top:18px;border-top:1px solid var(--rule)
   header.site nav{gap:12px}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+nav.related{margin:40px 0 0}nav.related h2{font-size:1.05rem;margin-bottom:8px}nav.related p{line-height:1.9}
