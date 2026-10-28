@@ -25,13 +25,13 @@ nothing sent anywhere. Never invent statistics or legal rules; when a convention
 - [x] 2026-10-19 RPE calculator → Program Progression (https://payhip.com/b/gpAwi)
 - [x] 2026-10-21 Client capacity calculator → Check-in Analyzer (https://payhip.com/b/7gC9P)
 - [x] 2026-10-21 Sale-to-list ratio calculator → Pricing Brief (https://payhip.com/b/7mleY)
+- [x] 2026-10-28 Weight loss rate calculator → Check-in Analyzer (https://payhip.com/b/7gC9P)
 
 ## Next (in this order)
 
 Researched 2026-10-19. Ranked by how often the audience needs it in real work, how directly it leads to the paid skill,
 and whether we can do it honestly without inventing local rules. Competing coach tools (e.g. coachway.io) show these are real search topics.
 
-- [ ] Weight loss rate calculator (% of body weight per week, goal date) → Check-in Analyzer (https://payhip.com/b/7gC9P). Show the common 0.5–1% per week guidance as a range, not a rule.
 - [ ] One rep max calculator (Epley, Brzycki, Lombardi side by side) → Program Progression (https://payhip.com/b/gpAwi).
 - [ ] Price per square foot calculator with adjustments → Pricing Brief (https://payhip.com/b/7mleY).
 - [ ] Showing feedback scorecard → Seller Update (https://payhip.com/b/UXnhj). Tally showing feedback by theme (price, condition, layout, location) and turn it into a one-line seller summary.

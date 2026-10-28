@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Weight Loss Rate Calculator: Percent of Body Weight per Week and Goal Date</title>
+<meta name="description" content="Free weight loss rate calculator for coaches and clients. See the rate so far as kg or lb and percent of body weight per week, and how many weeks a goal weight takes at 0.5%, 0.75% or 1% per week.">
+<link rel="canonical" href="https://temperbyte.github.io/weight-loss-rate-calculator/">
+<meta property="og:title" content="Weight Loss Rate Calculator">
+<meta property="og:description" content="Rate per week as a percent of body weight, and a realistic goal date.">
+<meta property="og:image" content="https://temperbyte.github.io/assets/social/23-weight-loss-rate.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<div class="wrap">
+<header class="site"><a class="brand" href="/"><i></i>Temperbyte</a><nav><a href="/">Free tools</a><a href="https://payhip.com/Temperbyte">Store</a></nav></header>
+
+<h1>Weight loss rate calculator</h1>
+<p class="lede">"Lost 2 kg this month" means something different for a 60 kg client than for a 120 kg client. Turn the change into a percent of body weight per week, and see how long a goal weight really takes.</p>
+
+<form class="tool" id="f" autocomplete="off" onsubmit="return false">
+  <fieldset>
+    <legend>Rate so far. Use weekly averages if you have them, not single weigh-ins.</legend>
+    <div class="grid">
+      <div><label for="u">Units</label><select id="u"><option value="kg" selected>kg</option><option value="lb">lb</option></select></div>
+      <div><label for="w0">Weight at the start</label><input id="w0" inputmode="decimal" value="86.0"></div>
+      <div><label for="w1">Weight now</label><input id="w1" inputmode="decimal" value="83.6"></div>
+      <div><label for="wk">Weeks between them</label><input id="wk" inputmode="decimal" value="4"></div>
+    </div>
+  </fieldset>
+  <fieldset>
+    <legend>Goal date (optional)</legend>
+    <div class="grid">
+      <div><label for="g">Goal weight</label><input id="g" inputmode="decimal" value="78"></div>
+      <div><label for="r">Planned rate, % of body weight per week</label><input id="r" inputmode="decimal" value="0.75"></div>
+    </div>
+  </fieldset>
+  <div class="result" id="out" aria-live="polite"></div>
+</form>
+
+<h2>Why percent of body weight</h2>
+<p>A fixed number like "1 kg a week" is a big push for a light client and a slow one for a heavy client. A percent scales with the person, so it is easier to compare clients and to keep the pace reasonable as the client gets lighter.</p>
+<h3>The range this calculator shows</h3>
+<p>A commonly cited range for lean, training people who want to keep muscle while losing fat is <strong>about 0.5–1% of body weight per week</strong> (Helms, Aragon and Fitschen, <em>Journal of the International Society of Sports Nutrition</em>, 2014). It is a guideline, not a rule. Clients with more weight to lose often lose faster at the start, and many people do well slower than 0.5%. The calculator only flags a rate outside the range so you look at it; it doesn't say the rate is wrong.</p>
+<h3>How it's calculated</h3>
+<ul>
+<li><strong>Rate per week</strong> = (start − now) ÷ weeks.</li>
+<li><strong>Percent per week</strong> = rate per week ÷ the average of the start and current weight × 100.</li>
+<li><strong>Weeks to goal</strong> assumes the client keeps losing the same percent of their <em>current</em> weight each week, so the weekly amount gets a little smaller as they get lighter: weeks = ln(goal ÷ now) ÷ ln(1 − rate). Real progress is never this smooth; treat the date as a rough guide.</li>
+</ul>
+<p class="note">A coaching aid, not medical advice. Clients under 18, pregnant or breastfeeding, or with a medical condition need their own doctor's advice on weight loss. Dizziness, fainting, missed periods, guilt around food or skipping meals to make up for eating are reasons to slow down and involve a professional, not to push the rate.</p>
+
+<div class="cta">
+  <p><strong>Doing this every week for every client?</strong> The Check-in Analyzer skill for Claude reads a pasted check-in, does the weekly average and rate math, makes the hold, adjust or review call with the reason, flags red flags, and writes a ready-to-send reply in your voice.</p>
+  <a class="btn" href="https://payhip.com/b/7gC9P?utm_source=temperbyte.github.io&amp;utm_medium=calculator&amp;utm_campaign=weight-loss-rate-calculator">See Check-in Analyzer</a>
+  <p class="note" style="margin-top:12px">Or try the <a href="https://payhip.com/b/MOo7j?utm_source=temperbyte.github.io&amp;utm_medium=calculator&amp;utm_campaign=weight-loss-rate-calculator">free lite version</a>, or turn daily weigh-ins into weekly averages with the free <a href="/weight-trend-calculator/">weight trend calculator</a>.</p>
+</div>
+
+<nav class="related" aria-label="More free calculators"><h2>More free tools for fitness coaches</h2><p><a href="/weight-trend-calculator/">Weight trend calculator</a> · <a href="/client-adherence-calculator/">Client adherence calculator</a> · <a href="/progressive-overload-calculator/">Progressive overload calculator</a> · <a href="/training-volume-calculator/">Training volume calculator</a> · <a href="/rpe-calculator/">RPE calculator</a> · <a href="/client-capacity-calculator/">Client capacity calculator</a></p></nav>
+
+<figure class="share"><img src="../assets/social/23-weight-loss-rate.png" alt="Weight loss rate calculator: percent of body weight per week and a goal date" width="200" height="300"><figcaption class="note">Useful? Save it to Pinterest or share the link with a colleague.</figcaption></figure>
+
+<footer class="site">Made by Temperbyte. Free tools and Claude skills for real estate agents and fitness coaches. <a href="https://payhip.com/Temperbyte">Store</a> · <a href="https://github.com/Temperbyte/temperbyte-skills.">Free skills on GitHub</a> · <a href="https://www.pinterest.com/temperbyte/">Pinterest</a> · <a href="https://x.com/Temperbyte_AI">X</a> · <a href="https://www.tiktok.com/@temperbyte_skills">TikTok</a></footer>
+</div>
+
+<script>
+const $=s=>document.querySelector(s);
+const num=id=>{const t=String($(id).value).trim();if(t==='')return null;const x=parseFloat(t.replace(',','.'));return isFinite(x)?x:NaN};
+const f1=x=>x.toFixed(1), f2=x=>x.toFixed(2);
+const LO=0.5, HI=1.0, MAXW=520;
+function weeksTo(now,goal,r){return Math.log(goal/now)/Math.log(1-r/100)}
+function dateIn(weeks){const d=new Date();d.setDate(d.getDate()+Math.round(weeks*7));return d.toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'})}
+function calc(){
+  const out=$('#out'), u=$('#u').value, parts=[], notes=[];
+  const w0=num('#w0'), w1=num('#w1'), wk=num('#wk'), g=num('#g'), r=num('#r');
+  const okW=x=>x!==null&&!isNaN(x)&&x>0&&x<1000;
+  if(!okW(w0)||!okW(w1)){out.innerHTML='<p class="note">Enter the start weight and the current weight (more than 0).</p>';return}
+  let pct=null;
+  if(wk===null||isNaN(wk)||wk<=0){
+    notes.push('Enter the weeks between the two weights (more than 0) to see the rate per week.');
+  }else{
+    const per=(w0-w1)/wk, avg=(w0+w1)/2; pct=per/avg*100;
+    let head,next;
+    if(per<0){head=`Gaining: <b>${f2(-per)} ${u} per week</b> (${f2(-pct)}% of body weight)`;next='Weight went up over the period. Check the weigh-in conditions and adherence before changing anything.'}
+    else if(per===0){head='<b>No change</b> over the period';next='If the client is aiming to lose weight and adherence is good, this is the time to change one thing by a small amount.'}
+    else{
+      head=`Losing <b>${f2(per)} ${u} per week</b>, or <b>${f2(pct)}% of body weight</b>`;
+      if(pct>HI) next=`Faster than the common ${LO}–${HI}% range. Worth a look: is it the first weeks (water), a very large client, or is the deficit too steep to keep up?`;
+      else if(pct<LO) next=`Slower than ${LO}% per week. That can be fine, especially near the goal. If the client wants faster and adherence is good, change one thing by a small amount.`;
+      else next=`Inside the common ${LO}–${HI}% range.`;
+    }
+    parts.push(`<p class="headline">${head}</p><p>${next}</p>`);
+    if(wk<2) notes.push('Less than two weeks is mostly water and noise. Two to four weeks of weekly averages give a much better read.');
+    notes.push(`Rate = (${f1(w0)} − ${f1(w1)}) ÷ ${+wk.toFixed(2)} = ${f2(per)} ${u}/week. Percent = ${f2(per)} ÷ ${f2(avg)} (average weight) × 100 = ${f2(pct)}%.`);
+  }
+  if(g!==null){
+    if(isNaN(g)||g<=0){notes.push('Goal weight must be a number more than 0.')}
+    else if(g>=w1){notes.push(`The goal (${f1(g)} ${u}) is not below the current weight, so there is no goal date to work out.`)}
+    else{
+      const rows=[];
+      const plan=(r!==null&&!isNaN(r)&&r>0&&r<5)?r:null;
+      if(r!==null&&plan===null) notes.push('Planned rate must be more than 0 and under 5% per week; showing the standard range only.');
+      const rates=[LO,0.75,HI]; if(plan!==null&&!rates.includes(plan)) rates.push(plan);
+      if(pct!==null&&pct>0.05&&pct<5) rates.push(+pct.toFixed(2));
+      const seen=new Set();
+      for(const x of rates.sort((a,b)=>a-b)){
+        if(seen.has(x))continue; seen.add(x);
+        const w=weeksTo(w1,g,x); if(!isFinite(w)||w>MAXW){rows.push(`<tr><td>${x}%</td><td class="n">over 10 years</td><td></td></tr>`);continue}
+        const lab=(plan===x?' (planned)':'')+(pct!==null&&x===+pct.toFixed(2)?' (current pace)':'');
+        rows.push(`<tr><td>${x}%${lab}</td><td class="n">${f1(w)}</td><td class="n">${dateIn(w)}</td></tr>`);
+      }
+      parts.push(`<h3 style="margin-top:18px">To ${f1(g)} ${u} (${f1(w1-g)} ${u} to go)</h3><div class="scroll"><table><thead><tr><th>Rate per week</th><th class="n">Weeks</th><th class="n">Around</th></tr></thead><tbody>${rows.join('')}</tbody></table></div>`);
+      const share=(w1-g)/w1*100;
+      if(share>20) notes.push(`That is ${f1(share)}% of current body weight. A goal this big is usually easier to plan in phases, with maintenance breaks between them.`);
+    }
+  }
+  out.innerHTML=parts.join('')+notes.map(t=>`<p class="note">${t}</p>`).join('');
+}
+document.addEventListener('input',calc);document.addEventListener('change',calc);calc();
+</script>
+</body>
+</html>
