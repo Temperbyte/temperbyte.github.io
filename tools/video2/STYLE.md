@@ -19,3 +19,7 @@ Build
   ./make.sh v1                  # music + mp4 -> out/v1.mp4
   node preview.js v1.html out/p.png 0.3 1.2 ...   # contact sheet to check before rendering
 Needs: node + playwright (Chromium), python3 numpy scipy, ffmpeg. Fonts are in fonts/ (OFL).
+
+Templates (2026-10-29): lib/tpl.js + cfg/<name>.js. kind "stat" (slam hook → proof card → big number + stamp → product chips → CTA),
+"hype" (four hype words → claim → same proof), "swipe" (five glass slides, data-t reveals). v4–v10 are examples.
+New video: copy a cfg, change the words and numbers (numbers only from the calculators), make a vN.html like v4.html, preview, render.
