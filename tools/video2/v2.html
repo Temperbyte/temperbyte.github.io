@@ -1,0 +1,174 @@
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="lib/base.css">
+<style>
+.full { position: absolute; inset: 0; }
+.stack { position: absolute; left: 0; right: 0; text-align: center; font-family: Anton; text-transform: uppercase; line-height: .86; white-space: nowrap; }
+.notes { position: absolute; left: 60px; right: 60px; top: 600px; padding: 48px 50px 56px; font: 500 40px/1.5 Mono; white-space: pre-wrap; color: #e9e6df; }
+.notes .lab, .out .lab { font: 700 24px/1 Inter; letter-spacing: .18em; text-transform: uppercase; color: var(--mute); margin-bottom: 26px; display: block; }
+.bad { border-radius: 8px; transition: none; }
+.out { position: absolute; left: 60px; right: 60px; top: 560px; padding: 50px 52px; background: #F2F0EB; color: #16181B; border-radius: 40px; box-shadow: 0 50px 100px rgba(0,0,0,.5); }
+.out .lab { color: #B0532B; margin: 0 0 14px; }
+.out h3 { font: 800 56px/1.08 InterD; letter-spacing: -.03em; margin-bottom: 34px; }
+.out p { font: 500 36px/1.42 Inter; color: #2a2c31; }
+.row { position: absolute; left: 70px; right: 70px; display: flex; flex-direction: column; gap: 10px; }
+.row .q { font: 600 44px/1.2 Mono; color: var(--ink); position: relative; display: inline-block; align-self: flex-start; }
+.row .q::after { content: ""; position: absolute; left: -6px; right: -6px; top: 52%; height: 7px; background: var(--or); transform-origin: 0 50%; transform: scaleX(var(--s, 0)); border-radius: 4px; box-shadow: 0 0 16px rgba(226,98,42,.8); }
+.row .why { font: 600 34px/1.2 Inter; color: var(--or2); }
+.x { display: inline-block; width: 58px; height: 58px; border-radius: 50%; background: var(--or); color: #16181B; font: 900 40px/58px Inter; text-align: center; margin-right: 18px; }
+.spark { position: absolute; width: 18px; height: 18px; background: #FFD27A; transform: rotate(45deg); border-radius: 3px; box-shadow: 0 0 20px #ffb347; }
+</style></head><body>
+<div id="world"><div class="bg"></div>
+<div class="orb" id="orb1" style="width:800px;height:800px;background:#C2501F"></div>
+<div class="orb" id="orb2" style="width:600px;height:600px;background:#6b3fa0"></div>
+<canvas id="wire" class="full" width="540" height="960"></canvas>
+<div id="hype" class="full"></div>
+<div id="stage"></div>
+<canvas id="mascot" class="full" width="1080" height="1920"></canvas>
+<div id="top"></div>
+</div>
+<div class="vig"></div><div class="flash" id="flash"></div>
+<script src="lib/three.min.js"></script><script src="lib/mascot.js"></script><script src="lib/kit.js"></script>
+<script>
+const { p, E, win, el, css, lerp, clamp } = K;
+window.DURATION = 15.0; window.FPS = 30;
+const B = 0.46875, BAR = 1.875;
+window.MUSIC = { style: "hype", bpm: 128, drop: 3.75 };
+window.SFX = [[0, "impact", .7], [B, "impact", .7], [2 * B, "impact", .75], [3 * B, "boom", 1], [3 * B + .1, "sparkle", .6],
+  [BAR + .1, "whoosh", .5], [3.05, "scratch", .9], [2 * BAR - .3, "whoosh", .6], [7.55, "whoosh", .7], [7.9, "glitch", .6], [8.35, "boom", .7],
+  [6 * BAR - .2, "whoosh", .6], [12.3, "stamp", .5], [12.6, "stamp", .5], [12.9, "stamp", .5], [7 * BAR, "boom", .9], [7 * BAR + .4, "sparkle", .7]];
+const S = document.getElementById("stage"), TOP = document.getElementById("top"), HY = document.getElementById("hype");
+const brand = el("div", "brand", TOP, "<i></i>Temperbyte");
+
+// ---- bar 1: over-the-top hype words, each fills the screen
+const words = [["New.", "#C2501F", "#F2F0EB"], ["Amazing.", "#F2F0EB", "#16181B"], ["Wonderful.", "#16181B", "#FF8A3D"], ["Best of<br>the best.", "#C2501F", "#16181B"]];
+const hw = words.map(([w, bg, fg], i) => {
+  const d = el("div", "full", HY); d.style.background = bg;
+  const rows = [];
+  const fs = [310, 250, 205, 230][i]; for (let r = 0; r < 5; r++) { const s = el("div", "stack", d, w); css(s, { color: fg, fontSize: fs + "px", top: (i === 3 ? 600 + (r - 2) * 520 : 680 + (r - 2) * fs * 1.25) + "px", opacity: r === 2 ? 1 : 0.18 }); rows.push(s); if (i === 3 && r > 2) s.style.display = "none"; }
+  return { d, rows };
+});
+const sparks = Array.from({ length: 26 }, (_, i) => { const s = el("div", "spark", S); return s; });
+
+// ---- bar 2: the claim + the scratch
+const c1 = el("div", "h", S, "The best listing<br>writer in the<br><span style='color:var(--or)'>history of<br>real estate.</span>"); css(c1, { top: "320px", fontSize: "112px" });
+const c2 = el("div", "mono", S, "…okay. proof."); css(c2, { position: "absolute", left: "84px", top: "1050px", fontSize: "54px", color: "var(--mute)" });
+
+// ---- bars 3-4: the agent's notes, typed
+const noteTxt = "3 bed 2 bath ranch, Maple Grove\n1,640 sq ft, built 1998\nfully fenced 0.31 acre lot\nkitchen redone 2023: quartz,\nnew cabinets, gas range\nnew roof 2021, HVAC 2022\n0.4 mi to Cedar Park\nperfect for young families,\nsafe quiet neighborhood,\ngreat schools!!";
+const BADS = ["perfect for young families", "safe quiet neighborhood", "great schools!!"];
+const notes = el("div", "glass notes", S, "");
+const nh = el("div", "h", S, "Your notes:"); css(nh, { top: "330px", fontSize: "96px" });
+const nh2 = el("div", "mono", S, "messy. rushed. risky."); css(nh2, { position: "absolute", left: "84px", top: "450px", fontSize: "44px", color: "var(--or2)" });
+
+// ---- bars 5-6: the output
+const oh = el("div", "h", S, "What you get:"); css(oh, { top: "330px", fontSize: "96px" });
+const out = el("div", "out", S, "<span class='lab'>Headline</span><h3>2023 Quartz Kitchen, 2021 Roof, 2022 HVAC</h3><span class='lab'>MLS public remarks</span><p>Single-level living on a fully fenced 0.31-acre lot in Maple Grove, 0.4 miles from Cedar Park. The kitchen was remodeled in 2023 with quartz counters, new cabinets and a gas range…</p>");
+
+// ---- bar 7: fair housing check
+const fh = el("div", "h", S, "+ a fair housing<br>check, built in."); css(fh, { top: "300px", fontSize: "96px" });
+const rows = [["perfect for young families", "familial status. removed."], ["safe quiet neighborhood", "swapped for a fact: 0.4 mi to Cedar Park"], ["great schools!!", "steering risk. removed."]].map(([q, why], i) => {
+  const r = el("div", "row", S, `<span class="q">"${q}"</span><span class="why"><span class="x">✕</span>${why}</span>`); css(r, { top: (640 + i * 250) + "px" }); return r; });
+
+// ---- bar 8: CTA
+const e0 = el("div", "mono", S, "Listing Writer · a Claude skill"); css(e0, { position: "absolute", left: 0, right: 0, textAlign: "center", top: "300px", fontSize: "44px", color: "var(--or2)" });
+const e1 = el("div", "slam", S, "Free"); css(e1, { top: "380px", fontSize: "330px", color: "var(--or)", textShadow: "0 0 70px rgba(226,98,42,.55)" });
+const e2 = el("div", "slam", S, "lite version"); css(e2, { top: "670px", fontSize: "170px" });
+const e3 = el("div", "h", S, "link in bio ↗"); css(e3, { top: "880px", fontSize: "76px", textAlign: "center", color: "var(--mute)", fontWeight: 800 });
+
+const wire = K.wireBg(document.getElementById("wire"));
+const grain = K.grain(document.getElementById("world"));
+const M = K.mascotStage(document.getElementById("mascot"));
+const orb1 = document.getElementById("orb1"), orb2 = document.getElementById("orb2"), flash = document.getElementById("flash"), world = document.getElementById("world");
+
+function slamIn(e, t, t0, t1, opt = {}) {
+  const k = p(t, t0, t0 + (opt.d || 0.16)), out = opt.out ? E.in3(p(t, t1 - 0.14, t1)) : 0, vis = t >= t0 && t < t1;
+  e.style.display = vis ? "" : "none"; if (!vis) return;
+  const blur = (1 - k) * 18;
+  e.style.opacity = Math.min(1, k * 3) * (1 - out); e.style.filter = blur > 0.3 ? `blur(${blur}px)` : "";
+  e.style.transform = `translateY(${-out * 120}px) scale(${lerp(opt.from || 1.45, 1, E.out5(k))})${opt.rot ? ` rotate(${opt.rot}deg)` : ""}`;
+}
+function fadeUp(e, t, t0, t1, dist = 60, base = "") {
+  const v = win(t, t0, t1, 0.3, 0.2);
+  e.style.display = v > 0 ? "" : "none"; e.style.opacity = v; e.style.transform = `${base} translateY(${(1 - v) * dist}px)`;
+}
+for (let i = 0; i < 16; i++) SFX.push([4.0 + i * 0.16, "type", 0.5]);
+SFX.push([6.6, "glitch", .5]);
+
+function mascotAt(t) {
+  const K0 = [[0, 860, 1820, 380], [1.8, 860, 1820, 380], [2.2, 760, 1640, 420], [3.7, 760, 1640, 420], [4.0, 880, 610, 260], [7.4, 880, 610, 260],
+    [7.9, 540, 1150, 520], [8.4, 540, 1150, 520], [8.9, 900, 572, 260], [11.0, 900, 572, 260], [11.5, 890, 1780, 380], [12.95, 890, 1780, 380], [13.4, 540, 1790, 500], [15, 540, 1790, 500]];
+  let i = 0; while (i < K0.length - 2 && t >= K0[i + 1][0]) i++;
+  const a = K0[i], b = K0[i + 1], k = E.io3(p(t, a[0], b[0]));
+  return { x: lerp(a[1], b[1], k), y: lerp(a[2], b[2], k), size: lerp(a[3], b[3], k) };
+}
+function mascotFace(t) {
+  if (t < BAR) return { expr: "money", bounce: 0.45, bounceRate: 13.4, armL: 2.3, armR: 2.3, flameBoost: 1.5 };
+  if (t < 3.05) return { expr: "love", armL: 1.2, armR: 1.2, bounce: 0.15 };
+  if (t < 3.75) return { expr: "shock", mouth: "o", armL: 0.4, armR: 0.4 };
+  if (t < 7.5) { const tt = t - 3.75; return { expr: tt > 2.6 ? "angry" : "neutral", lookX: -0.9 + (tt % 0.9) * 0.5, lookY: -0.4, turn: -0.35 }; }
+  if (t < 8.6) return { expr: "load", flameBoost: 2.0, tilt: Math.sin(t * 40) * 0.05, bounce: 0.2, bounceRate: 20 };
+  if (t < 11.25) return { expr: "happy", mouth: "smile", turn: -0.3, armL: 0.4, armR: 1.6 };
+  if (t < 13.125) return { expr: "smug", turn: -0.4, armR: 0.8 };
+  return { expr: "love", armR: 2.4 + Math.sin((t - 13) * 12) * 0.35, armL: 0.3, bounce: t < 13.8 ? 0.3 : 0 };
+}
+
+window.seek = function (t) {
+  const hits = [0, B, 2 * B, 3 * B, 8.35, 7 * BAR];
+  const sh = K.shake(t, hits, 24);
+  world.style.transform = `translate(${sh.x}px,${sh.y}px) rotate(${sh.r}deg)`;
+  let fl = 0; for (const h of [8.35, 7 * BAR]) if (t >= h) fl += Math.max(0, 1 - (t - h) / 0.3) * 0.4;
+  flash.style.opacity = fl;
+  css(orb1, { left: (120 + Math.sin(t * 0.5) * 140) + "px", top: (lerp(-100, 900, (Math.sin(t * 0.35) + 1) / 2)) + "px" });
+  css(orb2, { left: (480 + Math.cos(t * 0.4) * 160) + "px", top: (1250 + Math.sin(t * 0.5) * 200) + "px" });
+  wire(t, 0.9, { drift: t * 0.1 });
+  grain(t);
+
+  // bar 1
+  hw.forEach((h, i) => {
+    const t0 = i * B, t1 = i === 3 ? BAR : (i + 1) * B;
+    const on = t >= t0 && t < t1;
+    h.d.style.display = on ? "" : "none";
+    if (on) { const k = E.out5(p(t, t0, t0 + 0.14)); h.rows.forEach((r, j) => { r.style.transform = `translateX(${(j % 2 ? 1 : -1) * (1 - k) * 600 + (j % 2 ? -1 : 1) * (t - t0) * 120}px) scale(${j === 2 ? lerp(1.5, 1, k) : 1})`; }); }
+  });
+  brand.style.color = (t < BAR && Math.floor(t / B) % 2 === 1) ? "#16181B" : "";
+  sparks.forEach((s, i) => {
+    const t0 = 3 * B + (K.rand(i) * 0.2), life = 1.1, k = p(t, t0, t0 + life);
+    const vis = t >= t0 && k < 1; s.style.display = vis ? "" : "none"; if (!vis) return;
+    const a = K.rand(i + 9) * Math.PI * 2, d = 200 + K.rand(i + 3) * 520;
+    s.style.left = (540 + Math.cos(a) * d * E.out3(k)) + "px"; s.style.top = (900 + Math.sin(a) * d * E.out3(k) + k * k * 300) + "px";
+    s.style.opacity = 1 - k; s.style.transform = `rotate(${45 + k * 360}deg) scale(${1.4 - k})`;
+  });
+  // bar 2
+  fadeUp(c1, t, BAR, 2 * BAR - 0.05, 50);
+  const scr = t >= 3.05 && t < 3.35 ? Math.sin(t * 160) * 14 : 0;
+  c1.style.transform += ` translateX(${scr}px)`; c1.style.filter = t >= 3.05 && t < 3.35 ? "blur(2px)" : "";
+  fadeUp(c2, t, 3.15, 2 * BAR - 0.05, 20);
+  // bars 3-4
+  fadeUp(nh, t, 2 * BAR + 0.1, 4 * BAR - 0.05); fadeUp(nh2, t, 2 * BAR + 0.3, 4 * BAR - 0.05);
+  const nv = win(t, 2 * BAR, 4 * BAR + 0.3, 0.4, 0.4, E.back);
+  notes.style.display = nv > 0 ? "" : "none";
+  const fly = p(t, 4 * BAR - 0.05, 4 * BAR + 0.35);
+  notes.style.transform = `translateY(${(1 - Math.min(1, nv * 1.0)) * (fly > 0 ? 0 : 900) + fly * 500}px) scale(${1 - E.in3(fly) * 0.85}) rotate(${fly * 12}deg)`;
+  notes.style.opacity = fly > 0 ? 1 - fly : nv;
+  const n = Math.floor(clamp((t - 4.0) / 2.6) * noteTxt.length);
+  let txt = noteTxt.slice(0, n).replace(/&/g, "&amp;").replace(/</g, "&lt;");
+  const hl = p(t, 6.6, 6.9);
+  if (n >= noteTxt.length) for (const b of BADS) txt = txt.replace(b, `<span class="bad" style="background:rgba(226,98,42,${0.85 * hl});color:${hl > 0.5 ? "#16181B" : "inherit"}">${b}</span>`);
+  notes.innerHTML = `<span class="lab">Listing notes</span>${txt}${n < noteTxt.length && t > 4.0 ? "<span style='color:var(--or)'>▍</span>" : ""}`;
+  // bars 5-6
+  fadeUp(oh, t, 8.4, 6 * BAR - 0.05);
+  const ov = win(t, 8.35, 6 * BAR, 0.5, 0.3, E.back);
+  out.style.display = ov > 0 ? "" : "none"; out.style.opacity = Math.min(1, ov * 1.5);
+  out.style.transform = `translateY(${(1 - ov) * 300}px) scale(${lerp(0.7, 1, ov)}) rotate(${(1 - ov) * -4}deg)`;
+  // bar 7
+  fadeUp(fh, t, 6 * BAR + 0.05, 7 * BAR);
+  rows.forEach((r, i) => { const t0 = 12.3 + i * 0.3; fadeUp(r, t, 6 * BAR + 0.25 + i * 0.12, 7 * BAR, 40); r.querySelector(".q").style.setProperty("--s", E.out3(p(t, t0, t0 + 0.2))); });
+  // bar 8
+  fadeUp(e0, t, 7 * BAR, 15.1, 20);
+  slamIn(e1, t, 7 * BAR, 15.1, { from: 2.0 }); slamIn(e2, t, 7 * BAR + B, 15.1); fadeUp(e3, t, 7 * BAR + 2 * B, 15.1);
+
+  const m = mascotAt(t), f = mascotFace(t);
+  M.place(m.x, m.y, m.size, Object.assign({ t, shadow: (m.y < 1500 && (t > 3.9 && t < 7.5 || t > 8.8 && t < 11.1)) ? 0.4 : 0 }, f));
+  document.getElementById("mascot").style.display = (t < BAR && false) ? "none" : "";
+};
+document.fonts.ready.then(() => { seek(0); window.ready = true; });
+</script></body></html>

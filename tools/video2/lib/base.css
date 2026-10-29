@@ -1,0 +1,30 @@
+@font-face { font-family: Anton; src: url(../fonts/Anton-Regular.ttf); }
+@font-face { font-family: InterD; src: url(../fonts/InterDisplay-Black.otf); font-weight: 900; }
+@font-face { font-family: InterD; src: url(../fonts/InterDisplay-ExtraBold.otf); font-weight: 800; }
+@font-face { font-family: InterD; src: url(../fonts/InterDisplay-Bold.otf); font-weight: 700; }
+@font-face { font-family: Inter; src: url(../fonts/Inter-Medium.otf); font-weight: 500; }
+@font-face { font-family: Inter; src: url(../fonts/Inter-SemiBold.otf); font-weight: 600; }
+@font-face { font-family: Inter; src: url(../fonts/Inter-Bold.otf); font-weight: 700; }
+@font-face { font-family: Mono; src: url("../fonts/JetBrainsMono[wght].ttf"); font-weight: 100 800; }
+:root { --ink: #F2F0EB; --bg: #121316; --or: #E2622A; --or2: #FF8A3D; --brand: #B0532B; --mute: rgba(242,240,235,.62); }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { width: 1080px; height: 1920px; overflow: hidden; background: var(--bg); }
+body { font-family: Inter, sans-serif; color: var(--ink); -webkit-font-smoothing: antialiased; }
+#world { position: absolute; inset: 0; transform-origin: 50% 50%; }
+#stage { position: absolute; inset: 0; }
+.bg { position: absolute; inset: -60px; background: radial-gradient(120% 70% at 50% 30%, #1d1f24 0%, #121316 55%, #0b0c0e 100%); }
+.orb { position: absolute; border-radius: 50%; filter: blur(70px); opacity: .55; }
+canvas.full { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+canvas.grain { position: absolute; inset: 0; width: 1080px; height: 1920px; opacity: .07; mix-blend-mode: overlay; pointer-events: none; }
+.vig { position: absolute; inset: 0; background: radial-gradient(90% 60% at 50% 50%, transparent 55%, rgba(0,0,0,.55) 100%); pointer-events: none; }
+.abs { position: absolute; }
+.slam { position: absolute; left: 0; right: 0; text-align: center; font-family: Anton; text-transform: uppercase; line-height: .9; letter-spacing: -.005em; white-space: nowrap; }
+.h { position: absolute; left: 80px; right: 80px; font-family: InterD; font-weight: 900; letter-spacing: -.035em; line-height: 1.0; }
+.mono { font-family: Mono; font-weight: 500; }
+.brand { position: absolute; left: 72px; top: 92px; display: flex; gap: 14px; align-items: center; font: 700 26px/1 Inter; letter-spacing: .22em; text-transform: uppercase; }
+.brand i { width: 20px; height: 20px; background: var(--brand); display: block; box-shadow: 0 0 22px rgba(226,98,42,.6); }
+.glass { position: absolute; border-radius: 40px; background: linear-gradient(160deg, rgba(255,255,255,.11), rgba(255,255,255,.035) 60%); border: 1.5px solid rgba(255,255,255,.16);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.25), 0 40px 90px rgba(0,0,0,.45); backdrop-filter: blur(26px) saturate(140%); }
+.chip { position: absolute; padding: 18px 30px; border-radius: 999px; border: 2px solid rgba(255,255,255,.18); background: rgba(255,255,255,.07);
+  font: 700 38px/1 Inter; white-space: nowrap; backdrop-filter: blur(14px); }
+.flash { position: absolute; inset: 0; background: var(--or); mix-blend-mode: screen; opacity: 0; pointer-events: none; }

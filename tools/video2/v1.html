@@ -1,0 +1,176 @@
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="lib/base.css">
+<style>
+.bars { position: absolute; left: 70px; right: 70px; bottom: 120px; height: 470px; display: flex; gap: 22px; align-items: flex-end; }
+.bar { flex: 1; position: relative; border-radius: 18px 18px 8px 8px; background: linear-gradient(180deg, rgba(242,240,235,.85), rgba(242,240,235,.35)); transform-origin: 50% 100%; }
+.bar b { position: absolute; left: 50%; top: -58px; transform: translateX(-50%); font: 600 30px/1 Mono; color: var(--ink); white-space: nowrap; }
+.bar u { position: absolute; left: 0; right: 0; bottom: -56px; text-align: center; font: 600 26px/1 Inter; color: var(--mute); text-decoration: none; letter-spacing: .06em; }
+.bar.hot { background: linear-gradient(180deg, #FF8A3D, #C2501F); box-shadow: 0 0 50px rgba(255,120,40,.55); }
+.avg { position: absolute; left: 50px; right: 50px; height: 0; border-top: 5px dashed var(--or2); filter: drop-shadow(0 0 10px rgba(255,138,61,.8)); transform-origin: 0 50%; }
+.avg span { position: absolute; right: 0; top: -58px; font: 700 34px/1 Mono; color: var(--or2); background: #17181c; padding: 6px 12px; border-radius: 10px; }
+.stamp { position: absolute; font-family: Anton; font-size: 250px; line-height: 1; padding: 6px 54px 18px; border: 14px solid var(--or); color: var(--or); border-radius: 30px; letter-spacing: .02em;
+  background: rgba(18,19,22,.82); text-shadow: 0 0 40px rgba(226,98,42,.6); box-shadow: 0 0 60px rgba(226,98,42,.45), inset 0 0 40px rgba(226,98,42,.25); }
+.big { font-family: InterD; font-weight: 900; letter-spacing: -.04em; }
+.reply { position: absolute; left: 90px; right: 150px; padding: 34px 38px; border-radius: 36px 36px 36px 10px; background: #F2F0EB; color: #16181B; font: 600 38px/1.32 Inter; box-shadow: 0 30px 70px rgba(0,0,0,.45); }
+.reply small { display: block; font: 700 22px/1 Inter; letter-spacing: .16em; text-transform: uppercase; color: #B0532B; margin-bottom: 16px; }
+</style></head><body>
+<div id="world"><div class="bg"></div>
+<div class="orb" id="orb1" style="width:760px;height:760px;background:#C2501F"></div>
+<div class="orb" id="orb2" style="width:560px;height:560px;background:#3b4a8a"></div>
+<canvas id="wire" class="full" width="540" height="960"></canvas>
+<div id="stage"></div>
+<canvas id="mascot" class="full" width="1080" height="1920"></canvas>
+<div id="top"></div>
+</div>
+<div class="vig"></div><div class="flash" id="flash"></div>
+<script src="lib/three.min.js"></script><script src="lib/mascot.js"></script><script src="lib/kit.js"></script>
+<script>
+const { p, E, win, el, css, lerp, clamp } = K;
+window.DURATION = 15.0; window.FPS = 30;
+const B = 0.46875, BAR = 1.875;               // 128 bpm
+window.MUSIC = { style: "dark", bpm: 128, drop: 0.94 };
+window.SFX = [[0, "impact", .8], [B, "impact", .7], [2 * B, "boom", 1], [2 * B + .06, "pop", .6], [BAR, "whoosh", .5], [6 * B, "boom", 1],
+  [2 * BAR - .25, "whoosh", .7], [9.8, "stamp", 1], [7 * BAR - .2, "whoosh", .6], [7 * BAR + .9, "pop", .5], [7 * BAR + 1.3, "pop", .5],
+  [13.125, "boom", .8], [13.6, "sparkle", .6]];
+for (let i = 0; i < 7; i++) SFX.push([4.2 + i * 0.3, "tick", i === 6 ? .9 : .45]);
+SFX.push([7.6, "riser", .5]);
+
+const S = document.getElementById("stage"), TOP = document.getElementById("top");
+const brand = el("div", "brand", TOP, "<i></i>Temperbyte");
+
+// ---- scene A: hook
+const a1 = el("div", "slam", S, "Your client"); css(a1, { top: "330px", fontSize: "190px" });
+const a2 = el("div", "slam", S, "gained"); css(a2, { top: "520px", fontSize: "190px" });
+const a3 = el("div", "slam", S, "+1.2 kg"); css(a3, { top: "700px", fontSize: "330px", color: "var(--or)", textShadow: "0 0 60px rgba(226,98,42,.55)" });
+const a4 = el("div", "slam mono", S, "overnight."); css(a4, { top: "1020px", fontSize: "56px", fontFamily: "Mono", textTransform: "none", color: "var(--mute)" });
+const b1 = el("div", "h", S, "and you're about to<br><span style='color:var(--or)'>cut their calories?</span>"); css(b1, { top: "430px", fontSize: "92px", textAlign: "center" });
+const b2 = el("div", "slam", S, "Don't."); css(b2, { top: "740px", fontSize: "420px" });
+
+// ---- scene B/C: the week
+const head = el("div", "h", S, ""); css(head, { top: "250px", fontSize: "84px", textAlign: "left" });
+const card = el("div", "glass", S); css(card, { left: "60px", right: "60px", top: "760px", height: "720px" });
+const cardT = el("div", "mono", card, "ONE WEEK OF WEIGH-INS · KG"); css(cardT, { position: "absolute", left: "50px", top: "44px", fontSize: "26px", letterSpacing: ".12em", color: "var(--mute)" });
+const bars = el("div", "bars", card);
+const vals = [82.4, 82.6, 82.3, 82.1, 82.0, 82.2, 83.4], days = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"];
+const lo = 81.4, hi = 83.6;
+const barEls = vals.map((v, i) => { const b = el("div", "bar" + (i === 6 ? " hot" : ""), bars, `<b>${v.toFixed(1)}</b><u>${days[i]}</u>`); b.style.height = ((v - lo) / (hi - lo) * 100) + "%"; return b; });
+const note = el("div", "mono", card, "← pizza night"); css(note, { position: "absolute", right: "60px", top: "40px", fontSize: "30px", color: "var(--or2)" });
+const avg = el("div", "avg", card, "<span>avg 82.43</span>");
+const avgY = 120 + 470 * (1 - (82.43 - lo) / (hi - lo));   // bars area: bottom 120px, height 470px
+css(avg, { top: (720 - avgY) + "px" });
+const stat = el("div", "abs", S, ""); css(stat, { left: "80px", right: "380px", top: "470px", textAlign: "left" });
+stat.innerHTML = `<div class="big" style="font-size:150px;line-height:1" id="cnt">82.90</div><div class="mono" style="font-size:42px;color:var(--or2);margin-top:14px;line-height:1.3">−0.57% / week<br><span style="color:var(--ink)">on track.</span></div>`;
+const cnt = stat.querySelector("#cnt");
+const stamp = el("div", "stamp", S, "HOLD."); css(stamp, { left: "50%", top: "1020px" });
+
+// ---- scene D: product
+const d1 = el("div", "h", S, "Check-in Analyzer"); css(d1, { top: "300px", fontSize: "104px" });
+const d2 = el("div", "mono", S, "a Claude skill for coaches"); css(d2, { position: "absolute", left: "84px", top: "540px", fontSize: "40px", color: "var(--or2)" });
+const chips = ["Trend math", "Hold or adjust", "Red flags", "Reply in your voice"].map((s, i) => { const c = el("div", "chip", S, s); css(c, { left: "80px", top: (640 + i * 112) + "px" }); return c; });
+const reply = el("div", "reply", S, "<small>Draft reply</small>One heavy morning after pizza night. Your weekly average is still down 0.47 kg. We hold the plan.");
+css(reply, { top: "1120px", right: "330px" });
+
+// ---- scene E: CTA
+const e1 = el("div", "slam", S, "Free"); css(e1, { top: "330px", fontSize: "330px", color: "var(--or)", textShadow: "0 0 70px rgba(226,98,42,.55)" });
+const e2 = el("div", "slam", S, "version"); css(e2, { top: "620px", fontSize: "200px" });
+const e3 = el("div", "h", S, "link in bio ↗"); css(e3, { top: "860px", fontSize: "76px", textAlign: "center", color: "var(--mute)", fontWeight: 800 });
+
+// ---- background, mascot
+const wire = K.wireBg(document.getElementById("wire"));
+const grain = K.grain(document.getElementById("world"));
+const M = K.mascotStage(document.getElementById("mascot"));
+const orb1 = document.getElementById("orb1"), orb2 = document.getElementById("orb2"), flash = document.getElementById("flash"), world = document.getElementById("world");
+
+function slamIn(e, t, t0, t1, opt = {}) {
+  const k = p(t, t0, t0 + (opt.d || 0.16));
+  const out = opt.out ? E.in3(p(t, t1 - 0.14, t1)) : 0;
+  const vis = t >= t0 && t < t1;
+  e.style.display = vis ? "" : "none";
+  if (!vis) return;
+  const s = lerp(opt.from || 1.45, 1, E.out5(k));
+  const blur = (1 - k) * 18;
+  e.style.opacity = Math.min(1, k * 3) * (1 - out);
+  e.style.filter = blur > 0.3 ? `blur(${blur}px)` : "";
+  e.style.transform = `translateY(${(opt.dy || 0) - out * 120}px) scale(${s})${opt.rot ? ` rotate(${opt.rot}deg)` : ""}`;
+}
+function fadeUp(e, t, t0, t1, dist = 60) {
+  const v = win(t, t0, t1, 0.3, 0.2);
+  e.style.display = v > 0 ? "" : "none";
+  e.style.opacity = v; e.style.transform = `translateY(${(1 - v) * dist}px)`;
+}
+function popIn(e, t, t0, t1, base = "") {
+  const k = p(t, t0, t0 + 0.35), v = win(t, t0, t1, 0.35, 0.2);
+  e.style.display = v > 0 ? "" : "none";
+  e.style.opacity = Math.min(1, k * 2.5) * (t > t1 - 0.2 ? v : 1);
+  e.style.transform = `${base} scale(${lerp(0.6, 1, E.back(k))})`;
+}
+
+// mascot keyframes: [time, x, y(feet), size, extra]
+function mascotAt(t) {
+  const K0 = [
+    [0.0, 900, 2500, 380], [0.94, 900, 2500, 380], [1.25, 840, 1780, 400], [3.4, 840, 1780, 400], [3.9, 860, 762, 300],
+    [7.4, 860, 762, 300], [7.9, 880, 762, 300], [11.0, 880, 762, 300], [11.6, 890, 1760, 400], [12.9, 890, 1760, 400], [13.4, 540, 1770, 500], [15, 540, 1770, 500]];
+  let i = 0; while (i < K0.length - 2 && t >= K0[i + 1][0]) i++;
+  const a = K0[i], b = K0[i + 1], k = E.io3(p(t, a[0], b[0]));
+  const ease = (a[2] > 2000) ? E.back(p(t, a[0], b[0])) : k;
+  return { x: lerp(a[1], b[1], k), y: lerp(a[2], b[2], ease), size: lerp(a[3], b[3], k) };
+}
+function mascotFace(t) {
+  if (t < 1.875) return { expr: "shock", mouth: "o", armL: 1.3, armR: 1.3, bounce: t > 1.0 && t < 1.5 ? 0.25 : 0 };
+  if (t < 2.81) return { expr: "sad", lookX: -0.5, armL: 0.3, armR: 0.3 };
+  if (t < 3.75) return { expr: "angry", armL: 0.6, armR: 0.6, tilt: Math.sin(t * 30) * 0.03 * (t < 3.2 ? 1 : 0) };
+  if (t < 6.0) return { expr: "neutral", lookX: -0.8 + (t - 3.75) * 0.25, lookY: -0.3, turn: -0.35 };
+  if (t < 6.3) return { expr: "shock", mouth: "o", turn: -0.35, lookX: 0.2 };
+  if (t < 9.8) return { expr: "smug", turn: -0.25 };
+  if (t < 11.25) return { expr: "happy", mouth: "smile", bounce: 0.35, armL: 2.2, armR: 2.2 };
+  if (t < 13.125) return { expr: "neutral", lookX: -0.7, turn: -0.4, armR: 0.9 };
+  const wave = Math.sin((t - 13.1) * 12) * 0.35;
+  return { expr: t > 14.2 && t < 14.6 ? "wink" : "happy", mouth: "smile", armR: 2.4 + wave, armL: 0.3, bounce: t < 13.8 ? 0.3 : 0 };
+}
+
+window.seek = function (t) {
+  // world shake on impacts
+  const sh = K.shake(t, [0.94, 2.81, 9.8, 13.125], 26);
+  world.style.transform = `translate(${sh.x}px,${sh.y}px) rotate(${sh.r}deg)`;
+  const fl = Math.max(0, 1 - (t - 0.94) / 0.25) * (t >= 0.94 ? 0.35 : 0) + Math.max(0, 1 - (t - 2.81) / 0.25) * (t >= 2.81 ? 0.4 : 0) + Math.max(0, 1 - (t - 9.8) / 0.3) * (t >= 9.8 ? 0.3 : 0) + Math.max(0, 1 - (t - 13.125) / 0.3) * (t >= 13.125 ? 0.35 : 0);
+  flash.style.opacity = fl;
+  css(orb1, { left: (160 + Math.sin(t * 0.5) * 120) + "px", top: (lerp(-200, 900, (Math.sin(t * 0.3) + 1) / 2)) + "px" });
+  css(orb2, { left: (500 + Math.cos(t * 0.4) * 160) + "px", top: (1300 + Math.sin(t * 0.5) * 200) + "px" });
+  wire(t, t < 3.75 ? 0.5 : 1, { drift: t * 0.08 });
+  grain(t);
+
+  // A
+  slamIn(a1, t, 0, BAR, { out: 1 }); slamIn(a2, t, B, BAR, { out: 1 }); slamIn(a3, t, 2 * B, BAR, { out: 1, from: 1.8 });
+  fadeUp(a4, t, 3 * B, BAR);
+  fadeUp(b1, t, BAR, 2 * BAR - 0.1, 40);
+  slamIn(b2, t, 6 * B, 2 * BAR, { out: 1, from: 2.2, rot: -3 });
+  // B/C
+  const inCard = win(t, 2 * BAR, 6 * BAR - 0.05, 0.45, 0.3, E.back);
+  card.style.display = inCard > 0 ? "" : "none";
+  card.style.transform = `translateY(${(1 - inCard) * 900}px)`;
+  barEls.forEach((b, i) => { const k = p(t, 4.2 + i * 0.3, 4.2 + i * 0.3 + 0.35); b.style.transform = `scaleY(${E.back(k)})`; b.style.opacity = (k > 0 ? 1 : 0) * (t > 7.5 ? lerp(1, 0.35, p(t, 7.5, 8.0)) : 1); });
+  note.style.opacity = p(t, 6.3, 6.6) * (1 - p(t, 7.4, 7.6));
+  avg.style.transform = `scaleX(${E.io3(p(t, 7.9, 8.7))})`; avg.style.opacity = t > 7.9 ? 1 : 0;
+  avg.querySelector("span").style.opacity = p(t, 8.5, 8.8);
+  head.innerHTML = t < 7.5 ? "Daily weight<br>is <span style='color:var(--or)'>noise.</span>" : "The weekly<br>average says:";
+  fadeUp(head, t, 2 * BAR + 0.15, 7.45); if (t >= 7.5) fadeUp(head, t, 7.5, 9.7);
+  fadeUp(stat, t, 8.2, 6 * BAR);
+  cnt.textContent = K.count(t, 8.3, 9.3, 82.9, 82.43, 2);
+  const sk = p(t, 9.8, 9.95), sv = t >= 9.8 && t < 6 * BAR;
+  stamp.style.display = sv ? "" : "none";
+  stamp.style.transform = `translate(-50%,0) rotate(-7deg) scale(${lerp(2.4, 1, E.out5(sk))})`; stamp.style.opacity = Math.min(1, sk * 3) * (1 - p(t, 6 * BAR - 0.15, 6 * BAR));
+  if (t >= 9.8) { head.style.display = "none"; stat.style.transform = `translateY(${-200 * E.out3(p(t, 9.8, 10.1))}px)`; }
+  // D
+  fadeUp(d1, t, 6 * BAR + 0.05, 7 * BAR); fadeUp(d2, t, 6 * BAR + 0.2, 7 * BAR);
+  chips.forEach((c, i) => popIn(c, t, 6 * BAR + 0.35 + i * 0.23, 7 * BAR));
+  fadeUp(reply, t, 12.2, 7 * BAR, 80);
+  // E
+  slamIn(e1, t, 7 * BAR, 15.1, { from: 2.0 }); slamIn(e2, t, 7 * BAR + B, 15.1); fadeUp(e3, t, 7 * BAR + 2 * B, 15.1);
+  brand.style.opacity = 0.9;
+
+  // mascot
+  const m = mascotAt(t), f = mascotFace(t);
+  const blink = (Math.floor(t * 10) % 37 === 0) ? 1 : 0;
+  M.place(m.x, m.y, m.size, Object.assign({ t, blink: f.expr === "neutral" || f.expr === "smug" ? blink : 0, shadow: m.y > 1500 ? 0.0 : 0.4 }, f));
+};
+document.fonts.ready.then(() => { seek(0); window.ready = true; });
+</script></body></html>

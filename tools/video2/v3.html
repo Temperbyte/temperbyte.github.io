@@ -1,0 +1,134 @@
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="lib/base.css">
+<style>
+.bg3 { position: absolute; inset: -60px; background: linear-gradient(170deg, #17142a 0%, #1a1630 40%, #0f0e17 100%); }
+.dots { position: absolute; left: 0; right: 0; top: 230px; display: flex; justify-content: center; gap: 14px; }
+.dots i { width: 54px; height: 54px; border-radius: 50%; border: 2px solid rgba(255,255,255,.22); font: 700 24px/50px Inter; text-align: center; font-style: normal; color: var(--mute); background: rgba(255,255,255,.05); }
+.dots i.on { background: var(--or); border-color: var(--or); color: #16181B; box-shadow: 0 0 24px rgba(226,98,42,.7); }
+.slide { position: absolute; left: 70px; top: 440px; width: 940px; height: 1060px; padding: 70px 64px; overflow: hidden; background: linear-gradient(160deg, rgba(34,28,52,.74), rgba(16,14,26,.66) 70%) !important; }
+.k { font: 700 26px/1 Inter; letter-spacing: .18em; text-transform: uppercase; color: var(--or2); margin-bottom: 30px; }
+.t { font: 900 118px/0.98 InterD; letter-spacing: -.04em; }
+.t em { font-style: normal; color: var(--or2); text-shadow: 0 0 30px rgba(255,138,61,.35); }
+.sub { font: 500 50px/1.3 Inter; color: var(--mute); margin-top: 40px; }
+.line { display: flex; justify-content: space-between; align-items: baseline; padding: 24px 0; border-bottom: 1.5px solid rgba(255,255,255,.12); font: 600 44px/1.2 Inter; }
+.line span:last-child { font: 600 46px/1 Mono; }
+.neg { color: #ff9b7a; }
+.tot { margin-top: 36px; }
+.tot .lab { font: 700 26px/1 Inter; letter-spacing: .16em; text-transform: uppercase; color: var(--mute); }
+.tot .num { white-space: nowrap; font: 900 132px/1 InterD; letter-spacing: -.04em; color: var(--ink); margin-top: 12px; }
+.offer { border-radius: 30px; padding: 38px 42px; background: rgba(255,255,255,.06); border: 1.5px solid rgba(255,255,255,.14); margin-top: 26px; }
+.offer .n { font: 700 28px/1 Inter; letter-spacing: .14em; text-transform: uppercase; color: var(--mute); }
+.offer .v { font: 800 92px/1.1 InterD; letter-spacing: -.03em; margin-top: 12px; }
+.offer .d { font: 600 36px/1.3 Mono; color: #ff9b7a; margin-top: 6px; }
+.offer.win { border-color: var(--or); box-shadow: 0 0 40px rgba(226,98,42,.35); }
+.pill { display: inline-block; padding: 22px 34px; margin: 0 16px 20px 0; border-radius: 999px; background: rgba(255,255,255,.08); border: 1.5px solid rgba(255,255,255,.18); font: 700 44px/1 Inter; }
+.calc { display: flex; align-items: center; gap: 26px; padding: 30px 0; font-size: 56px !important; border-bottom: 1.5px solid rgba(255,255,255,.12); font: 700 50px/1.1 InterD; letter-spacing: -.02em; }
+.calc b { width: 74px; height: 74px; border-radius: 22px; background: var(--or); color: #16181B; font: 900 40px/74px Inter; text-align: center; flex: none; }
+</style></head><body>
+<div id="world"><div class="bg3"></div>
+<div class="orb" id="orb1" style="width:820px;height:820px;background:#E2622A;opacity:.7"></div>
+<div class="orb" id="orb2" style="width:640px;height:640px;background:#C2367A;opacity:.45"></div>
+<div class="orb" id="orb3" style="width:420px;height:420px;background:#FF9A3D;opacity:.6"></div>
+<canvas id="wire" class="full" width="540" height="960"></canvas>
+<div id="stage"></div>
+<canvas id="mascot" class="full" width="1080" height="1920"></canvas>
+<div id="top"></div>
+</div>
+<div class="vig" style="opacity:.6"></div><div class="flash" id="flash"></div>
+<script src="lib/three.min.js"></script><script src="lib/mascot.js"></script><script src="lib/kit.js"></script>
+<script>
+const { p, E, win, el, css, lerp, clamp } = K;
+window.DURATION = 15.0; window.FPS = 30;
+const B = 0.46875, BAR = 1.875;
+window.MUSIC = { style: "glide", bpm: 128, drop: 1.875 };
+const SW = [1.875, 5.625, 9.375, 11.25];          // swipe times
+window.SFX = [[0, "impact", .6], [0.95, "pop", .5]];
+for (const s of SW) SFX.push([s - 0.12, "whoosh", .7]);
+SFX.push([2.5, "tick", .5], [2.9, "tick", .5], [3.3, "tick", .5], [3.7, "tick", .5], [4.3, "boom", .6], [7.4, "riser", .4], [8.3, "pop", .7], [8.9, "sparkle", .5], [10.2, "pop", .4], [10.4, "pop", .4], [10.6, "pop", .4], [10.8, "pop", .4], [12.0, "pop", .4], [12.3, "pop", .4], [12.6, "pop", .4], [13.3, "sparkle", .6]);
+const S = document.getElementById("stage"), TOP = document.getElementById("top");
+const brand = el("div", "brand", TOP, "<i></i>Temperbyte");
+const dots = el("div", "dots", TOP, [1, 2, 3, 4, 5].map((n) => `<i>${n}</i>`).join(""));
+const dotEls = [...dots.children];
+
+const slides = [];
+const mk = (html) => { const s = el("div", "glass slide", S, html); slides.push(s); return s; };
+mk(`<div class="k">For listing agents</div><div class="t">Your seller<br>doesn't care<br>about <em>list<br>price.</em></div><div class="sub" id="s1sub">They care about what<br>hits their bank account.</div>`);
+mk(`<div class="k">Seller net sheet</div>
+<div class="line"><span>Sale price</span><span>$450,000</span></div>
+<div class="line"><span>Mortgage payoff</span><span class="neg">−$262,000</span></div>
+<div class="line"><span>Commission</span><span class="neg">−</span></div>
+<div class="line"><span>Transfer tax, title, taxes</span><span class="neg">−</span></div>
+<div class="line"><span>Seller credit</span><span class="neg">−$5,000</span></div>
+<div class="tot"><div class="lab">Net to seller</div><div class="num" id="net">$0</div></div>`);
+mk(`<div class="k">Multiple offers</div><div class="t" style="font-size:100px">Highest offer<br>≠ <em>best offer.</em></div>
+<div class="offer" id="oA"><div class="n">Offer A</div><div class="v">$472,000</div><div class="d">asks $8,000 in credits</div></div>
+<div class="offer" id="oC"><div class="n">Offer C · escalation</div><div class="v" id="oCv">$455,000</div><div class="d" style="color:var(--or2)" id="oCd">escalates…</div></div>`);
+mk(`<div class="k">Low appraisal</div><div class="t" style="font-size:96px">$500k contract.<br>$485k appraisal.<br><em>$15,000 gap.</em></div>
+<div class="sub" style="margin:48px 0 34px">4 ways to close it, side by side:</div>
+<div id="pills"><span class="pill">Gap clause</span><span class="pill">Buyer covers it</span><span class="pill">Seller drops</span><span class="pill">Split it</span></div>`);
+mk(`<div class="k">All free · no sign-up</div><div class="t" style="font-size:100px">3 calculators<br>every listing<br>agent <em>needs.</em></div>
+<div style="margin-top:40px" id="calcs"><div class="calc"><b>1</b>Seller net sheet</div><div class="calc"><b>2</b>Escalation offers</div><div class="calc"><b>3</b>Appraisal gap</div></div>
+<div class="sub" style="color:var(--ink);font-weight:700;margin-top:48px" id="lib">link in bio ↗</div>`);
+
+const wire = K.wireBg(document.getElementById("wire"), { color: "#FF8A3D" });
+const grain = K.grain(document.getElementById("world"));
+const M = K.mascotStage(document.getElementById("mascot"), { rim: "#ff7ab6" });
+const orb1 = document.getElementById("orb1"), orb2 = document.getElementById("orb2"), orb3 = document.getElementById("orb3"), world = document.getElementById("world");
+
+function mascotFace(t) {
+  if (t < 0.9) return { expr: "angry", armL: 0.5, armR: 0.5 };
+  if (t < BAR) return { expr: "smug", turn: -0.3 };
+  if (t < 4.3) return { expr: "neutral", lookX: -0.8, lookY: -0.5, turn: -0.4 };
+  if (t < 5.6) return { expr: "money", bounce: 0.3, armL: 2.2, armR: 2.2 };
+  if (t < 8.3) return { expr: "neutral", lookX: -0.6, lookY: -0.6, turn: -0.4 };
+  if (t < 9.4) return { expr: "happy", mouth: "smile", armR: 2.2, bounce: 0.2 };
+  if (t < 11.25) return { expr: "shock", mouth: "o", turn: -0.3 };
+  return { expr: t > 14.0 && t < 14.4 ? "wink" : "happy", mouth: "smile", armR: 2.4 + Math.sin((t - 11) * 12) * 0.35, armL: 0.3, bounce: t < 11.9 ? 0.3 : 0 };
+}
+
+window.seek = function (t) {
+  const sh = K.shake(t, [0, 4.3], 14);
+  world.style.transform = `translate(${sh.x}px,${sh.y}px)`;
+  css(orb1, { left: (-120 + Math.sin(t * 0.45) * 160 - t * 18) + "px", top: (lerp(0, 800, (Math.sin(t * 0.3) + 1) / 2)) + "px" });
+  css(orb2, { left: (520 + Math.cos(t * 0.4) * 160) + "px", top: (1250 + Math.sin(t * 0.5) * 180) + "px" });
+  css(orb3, { left: (700 + Math.sin(t * 0.6) * 120) + "px", top: (150 + Math.cos(t * 0.5) * 120) + "px" });
+  wire(t, 0.55, { drift: t * 0.12 });
+  grain(t);
+
+  // which slide + swipe offset
+  let idx = 0; for (const s of SW) if (t >= s) idx++;
+  slides.forEach((s, i) => {
+    let x = (i - idx) * 1100, rot = 0, sc = 1;
+    const sw = SW[idx - 1];
+    if (sw != null && t - sw < 0.45) { const k = E.out5(p(t, sw, sw + 0.45)); x = (i - idx + 1 - k) * 1100; }
+    if (i === 0) { const k = E.back(p(t, 0, 0.5)); sc = lerp(0.7, 1, k); s.style.opacity = Math.min(1, p(t, 0, 0.2) * 3); }
+    s.style.display = Math.abs(x) < 1090 ? "" : "none";
+    rot = x / 1100 * -6;
+    s.style.transform = `translateX(${x}px) rotate(${rot}deg) scale(${sc})`;
+  });
+  dotEls.forEach((d, i) => d.classList.toggle("on", i === idx));
+  // slide 1
+  const s1 = document.getElementById("s1sub"); s1.style.opacity = p(t, 0.95, 1.25); s1.style.transform = `translateY(${(1 - p(t, 0.95, 1.25)) * 30}px)`;
+  // slide 2: lines one by one, then the total counts up
+  [...slides[1].querySelectorAll(".line")].forEach((l, i) => { const k = p(t, 2.1 + i * 0.4, 2.4 + i * 0.4); l.style.opacity = k; l.style.transform = `translateX(${(1 - E.out3(k)) * 60}px)`; });
+  const nk = E.out3(p(t, 4.3, 5.1));
+  document.getElementById("net").textContent = "≈ $" + (Math.round(lerp(450000, 154400, nk) / 100) * 100).toLocaleString("en-US");
+  document.getElementById("net").style.color = nk >= 1 ? "var(--or2)" : ""; slides[1].querySelector(".tot").style.opacity = p(t, 4.15, 4.35);
+  // slide 3: offer C escalates past A
+  const ek = E.io3(p(t, 7.5, 8.3));
+  document.getElementById("oCv").textContent = "$" + (Math.round(lerp(455000, 474000, ek) / 1000) * 1000).toLocaleString("en-US");
+  document.getElementById("oCd").textContent = ek < 1 ? "escalates…" : "escalated to $474,000";
+  document.getElementById("oC").classList.toggle("win", ek >= 1);
+  // slide 4 pills
+  [...document.querySelectorAll("#pills .pill")].forEach((pl, i) => { const k = p(t, 10.2 + i * 0.2, 10.5 + i * 0.2); pl.style.opacity = k; pl.style.transform = `scale(${lerp(0.6, 1, E.back(k))})`; });
+  // slide 5
+  [...document.querySelectorAll("#calcs .calc")].forEach((c, i) => { const k = p(t, 12.0 + i * 0.3, 12.35 + i * 0.3); c.style.opacity = k; c.style.transform = `translateX(${(1 - E.out3(k)) * 80}px)`; });
+  const lk = p(t, 13.2, 13.5); const lb = document.getElementById("lib"); lb.style.opacity = lk; lb.style.transform = `translateY(${(1 - lk) * 20}px) scale(${1 + Math.max(0, Math.sin((t - 13.5) * 6)) * 0.04 * (t > 13.5 ? 1 : 0)})`;
+
+  // mascot stands on the top edge of the card, right side; hops at each swipe
+  let hopk = 0; for (const s of SW) { const d = t - s; if (d >= -0.1 && d < 0.45) hopk = Math.sin(Math.PI * clamp((d + 0.1) / 0.55)); }
+  const entry = E.back(p(t, 0.15, 0.7));
+  const mx = 860, my = 442 - hopk * 55 - (1 - entry) * 600;
+  M.place(mx, my, 250, Object.assign({ t, shadow: hopk > 0.2 ? 0.15 : 0.4, visible: t > 0.15 }, mascotFace(t)));
+};
+document.fonts.ready.then(() => { seek(0); window.ready = true; });
+</script></body></html>
