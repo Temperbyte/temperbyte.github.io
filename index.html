@@ -9,15 +9,52 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/site.css">
+<meta property="og:title" content="Temperbyte: free calculators and Claude skills for agents and coaches">
+<meta property="og:description" content="Small tools for the math you do every week. No sign-up.">
+<meta property="og:image" content="https://temperbyte.github.io/assets/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<style>
+.hero{background:radial-gradient(70% 90% at 80% 40%,#3a1c0e 0%,#16181B 55%,#0d0e10 100%);color:#F2F0EB;position:relative;overflow:hidden}
+.hero::before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(226,98,42,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(226,98,42,.07) 1px,transparent 1px);background-size:44px 44px;mask-image:radial-gradient(70% 80% at 70% 40%,#000 30%,transparent 80%);-webkit-mask-image:radial-gradient(70% 80% at 70% 40%,#000 30%,transparent 80%)}
+.hero .wrap{position:relative}
+.hero header.site nav{color:rgba(242,240,235,.7)}
+.hero header.site .brand i{background:#E2622A;box-shadow:0 0 14px rgba(226,98,42,.7)}
+.hero-grid{display:grid;grid-template-columns:1.25fr .9fr;align-items:center;gap:8px;padding:28px 0 56px}
+.hero h1{margin:28px 0 14px;color:#F2F0EB}
+.hero h1 em{font-style:normal;color:#FF8A3D}
+.hero .lede{color:rgba(242,240,235,.72)}
+.hero-cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:26px}
+.hero-cta a{display:inline-block;padding:13px 20px;border-radius:999px;font-weight:600;font-size:16px;text-decoration:none}
+.hero-cta .primary{background:#E2622A;color:#16181B;box-shadow:0 8px 30px rgba(226,98,42,.35)}
+.hero-cta .primary:hover{background:#FF8A3D;color:#16181B}
+.hero-cta .ghost{border:1.5px solid rgba(242,240,235,.28);color:#F2F0EB}
+.hero-cta .ghost:hover{border-color:#FF8A3D;color:#FF8A3D}
+.byte{width:100%;height:auto;max-width:300px;justify-self:center;filter:drop-shadow(0 30px 40px rgba(0,0,0,.45));animation:bob 4s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0) rotate(-1deg)}50%{transform:translateY(-10px) rotate(1deg)}}
+@media (prefers-reduced-motion:reduce){.byte{animation:none}}
+.hero-art{text-align:center}
+.byte-tag{display:block;text-align:center;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:rgba(242,240,235,.5);margin-top:6px}
+@media (max-width:640px){.hero-grid{grid-template-columns:1fr;padding-bottom:40px}.hero-art{order:-1}.byte{max-width:190px}.hero h1{margin-top:8px}}
+.after-hero h2:first-child{margin-top:44px}
+</style>
 </head>
 <body>
+<section class="hero">
 <div class="wrap">
 <header class="site"><a class="brand" href="/"><i></i>Temperbyte</a><nav><a href="https://payhip.com/Temperbyte">Store</a><a href="https://github.com/Temperbyte/temperbyte-skills.">GitHub</a></nav></header>
-
-<h1>Free calculators for agents and coaches</h1>
+<div class="hero-grid">
+<div>
+<h1>Free calculators for <em>agents and coaches</em></h1>
 <p class="lede">Small tools for the math you do every week. No sign-up, nothing to install, and nothing you type leaves your browser.</p>
+<div class="hero-cta"><a class="primary" href="#tools">Open the free calculators</a><a class="ghost" href="https://payhip.com/Temperbyte">Claude skills</a></div>
+</div>
+<div class="hero-art"><picture><source srcset="assets/byte.webp" type="image/webp"><img class="byte" src="assets/byte.png" alt="Byte, the Temperbyte mascot: a small orange cube robot with a glowing face" width="640" height="631"></picture><span class="byte-tag">Hi, I'm Byte</span></div>
+</div>
+</div>
+</section>
+<div class="wrap after-hero">
 
-<h2>For real estate agents</h2>
+<h2 id="tools">For real estate agents</h2>
 <ul class="tools-list">
   <li><a href="/comps-price-calculator/">Comps price calculator</a><p>Comparable sales in: price per square foot for each comp, outliers flagged, the median and a suggested list price range with the math shown.</p></li>
   <li><a href="/price-reduction-calculator/">Price reduction calculator</a><p>Days on market, showings and feedback give a hold or discuss-price signal, and the search bracket math shows which buyers a new price would reach.</p></li>
