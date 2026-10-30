@@ -1,0 +1,17 @@
+{
+ "dropped_2026-10-30": [
+  "r08-training-volume",
+  "r09-mls-phrases",
+  "r10-client-adherence",
+  "r11-months-inventory",
+  "r12-checkin-analyzer",
+  "r13-comps-price",
+  "r14-client-capacity",
+  "r15-price-reduction",
+  "r16-rpe-scale",
+  "r17-net-at-other-prices",
+  "r18-weight-noise",
+  "r19-appraisal-buyer-cash",
+  "r20-capacity-income"
+ ]
+}

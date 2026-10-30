@@ -23,3 +23,10 @@ Needs: node + playwright (Chromium), python3 numpy scipy, ffmpeg. Fonts are in f
 Templates (2026-10-29): lib/tpl.js + cfg/<name>.js. kind "stat" (slam hook → proof card → big number + stamp → product chips → CTA),
 "hype" (four hype words → claim → same proof), "swipe" (five glass slides, data-t reveals). v4–v10 are examples.
 New video: copy a cfg, change the words and numbers (numbers only from the calculators), make a vN.html like v4.html, preview, render.
+
+Publishing (2026-10-30)
+- Finished videos go to media/reels/<id>.mp4 and into media/reels/queue.json (id, date, url, caption, seconds).
+  AVA's Mac posts the day's Reel to Instagram from that queue. TikTok is scheduled separately in TikTok Studio.
+- The old-style reels r08–r20 were taken out of the queue on 2026-10-30 (list in media/reels/old-style-not-queued.json);
+  their files are kept.
+- tools/video/make_reels.py (old style) is no longer used for new batches.
