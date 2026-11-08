@@ -2,8 +2,8 @@
 
 The weekly build takes the first unchecked item, builds it, and ticks it with the date and URL.
 Every calculator: one static page at `/<slug>/index.html`, same structure and `assets/site.css` as the existing calculators
-(header nav "Free tools" + "Store", h1, lede, `form.tool`, live result in `#out`, explanation sections, `.note` disclaimer,
-`.cta` to the matching paid skill (Payhip links carry `?utm_source=temperbyte.github.io&utm_medium=calculator&utm_campaign=<slug>`), `figure.share` with the pin image, standard footer), plain JavaScript, no libraries,
+(header nav "Free tools" + "Free skills" (GitHub), h1, lede, `form.tool`, live result in `#out`, explanation sections, `.note` disclaimer,
+`.cta` to the matching free skill on GitHub (`https://github.com/Temperbyte/temperbyte-skills./tree/main/skills/<skill>`; all skills are free, no paid links), `figure.share` with the pin image, standard footer), plain JavaScript, no libraries,
 nothing sent anywhere. Never invent statistics or legal rules; when a convention varies by market, say so on the page.
 
 ## Done
